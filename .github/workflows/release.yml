@@ -28,6 +28,6 @@ jobs:
         files: ./assets/*
         tag_name: v${{ env.APPLICATION_VERSION }}
         name: v${{ env.APPLICATION_VERSION }}
-        token: ${{ secrets.REPO_TOKEN }}
+        token: ${{ secrets.GH_TOKEN }}
         body: |
           Release v${{ env.APPLICATION_VERSION }}
