@@ -1,0 +1,13 @@
+id: b013c4f8
+config: ./edge-leap.yaml
+version: 1
+module:
+    name: ""
+    manifest: ""
+image:
+    repo: ""
+device:
+    name: ""
+    arch: ""
+infra: {}
+auth: {}
