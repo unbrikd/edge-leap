@@ -1,0 +1,29 @@
+name: ci-cd
+on:
+  push:
+    branches:
+      - 'master'
+      - 'v[0-9]*'
+      - 'feature/*'
+      - 'fix/*'
+
+    tags:
+      - 'v*'
+
+  pull_request:
+    branches:
+      - 'master'
+
+jobs:
+  prepare:
+    uses: ./.github/workflows/prepare.yml
+  
+  build:
+    needs: prepare
+    uses: ./.github/workflows/build.yml
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    uses: ./.github/workflows/release.yml
+    secrets: inherit
