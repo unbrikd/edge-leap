@@ -1,0 +1,33 @@
+name: release
+
+on:
+  workflow_call:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2
+
+    - name: Download release assets
+      uses: actions/download-artifact@v4
+      with:
+        name: assets
+        path: ./assets
+
+    - name: Set release version
+      run: |
+        version=$(make print-version)
+        echo "APPLICATION_VERSION=${version}" >> $GITHUB_ENV
+    
+    - name: Create release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ./assets/*
+        tag_name: v${{ env.APPLICATION_VERSION }}
+        name: v${{ env.APPLICATION_VERSION }}
+        token: ${{ secrets.REPO_TOKEN }}
+        body: |
+          Release v${{ env.APPLICATION_VERSION }}
