@@ -30,17 +30,17 @@ var manifestCmd = &cobra.Command{
 			return
 		}
 
-		ctl := controller.New(c, "azure")
+		// ctl := controller.New(c, "azure")
 
-		if err = ctl.DeleteLayeredDeployment(c); err != nil {
-			fmt.Printf("failed to delete layered deployment: %v\n", err)
-			return
-		}
+		// if err = ctl.DeleteLayeredDeployment(c.); err != nil {
+		// 	fmt.Printf("failed to delete layered deployment: %v\n", err)
+		// 	return
+		// }
 
-		if err = ctl.CreateLayeredDeployment(c); err != nil {
-			fmt.Printf("failed to create layered deployment: %v\n", err)
-			return
-		}
+		// if err = ctl.CreateLayeredDeployment(c); err != nil {
+		// 	fmt.Printf("failed to create layered deployment: %v\n", err)
+		// 	return
+		// }
 
 		fmt.Printf("%s-%s\n", c.Image.Repo, c.Id)
 	},

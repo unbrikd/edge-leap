@@ -1,0 +1,14 @@
+id: fd4325da
+config: ./edge-leap.yaml
+version: 1
+module:
+    name: ""
+    manifest: ""
+image:
+    repo: "etib-devices"
+device:
+    name: ""
+    arch: ""
+infra:
+    hub: "iot-bems-dev-euw-p01"
+auth: {}
