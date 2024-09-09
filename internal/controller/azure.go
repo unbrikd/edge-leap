@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"os"
 	"strings"
 )
@@ -198,6 +200,134 @@ func (az *azCtl) GetLayeredDeployment(id string) (*LayeredManifest, error) {
 	}
 
 	return &lm, nil
+}
+
+// A Client manages communication with the GitHub API.
+type Client struct {
+	client  *http.Client // HTTP client used to communicate with the API.
+	BaseURL *url.URL
+
+	Configurations *ConfigurationsService
+}
+
+type service struct {
+	client *Client
+
+	// Base URL for API requests. Every service should have a base URL set, since the azure API base URL differs from
+	// resource to resource.
+	baseURL *url.URL
+}
+
+func NewClient(httpClient *http.Client) *Client {
+	if httpClient == nil {
+		httpClient = &http.Client{}
+	}
+
+	httpClient2 := *httpClient
+	c := &Client{client: &httpClient2}
+	c.initialize()
+	return c
+}
+
+func (c *Client) WithAuthToken(token string) *Client {
+	t := c.client.Transport
+	if t == nil {
+		t = http.DefaultTransport
+	}
+
+	// create a new client with the given token
+	c.client.Transport = roundTripperFunc(
+		func(req *http.Request) (*http.Response, error) {
+			req.Header.Set("Authorization", token)
+			return t.RoundTrip(req)
+		},
+	)
+
+	return c
+}
+
+func (c *Client) initialize() {
+	if c.BaseURL == nil {
+		c.BaseURL, _ = url.Parse("https://azure.devices.net/")
+	}
+	c.Configurations = &ConfigurationsService{client: c, baseURL: c.BaseURL}
+}
+
+// roundTripperFunc is a custom type that allows us to use a function as an http.RoundTripper
+type roundTripperFunc func(*http.Request) (*http.Response, error)
+
+// RoundTrip is the implementation of the http.RoundTripper interface for roundTripperFunc
+func (f roundTripperFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req)
+}
+
+func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
+	// if !strings.HasSuffix(c.BaseURL.Path, "/") {
+	// 	return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.BaseURL)
+	// }
+
+	u, err := c.BaseURL.Parse(urlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	// var buf io.ReadWriter
+	// if body != nil {
+	// 	buf = &bytes.Buffer{}
+	// 	enc := json.NewEncoder(buf)
+	// 	enc.SetEscapeHTML(false)
+	// 	err := enc.Encode(body)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
+
+	req, err := http.NewRequest(method, u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+
+	// print the request headers to the console
+	dump, err := httputil.DumpRequestOut(req, true)
+	if err != nil {
+		return nil, fmt.Errorf("error dumping request: %v", err)
+	}
+	fmt.Println("Request Headers:")
+	fmt.Printf("%s\n", dump)
+
+	return req, nil
+}
+
+func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
+	fmt.Println("On Do")
+	res, err := c.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	fmt.Println("On Do 2")
+
+	// dump the response to the console
+	dump, err := httputil.DumpResponse(res, true)
+	if err != nil {
+		return nil, fmt.Errorf("error dumping response: %v", err)
+	}
+	fmt.Printf("%s\n", dump)
+
+	decErr := json.NewDecoder(res.Body).Decode(v)
+	if decErr == io.EOF {
+		decErr = nil
+	}
+	if decErr != nil {
+		err = decErr
+	}
+
+	return res, nil
 }
 
 // func updateManifest(c *configuration.Configuration) error {

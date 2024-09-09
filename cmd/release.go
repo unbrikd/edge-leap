@@ -1,12 +1,13 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/spf13/cobra"
 	"github.com/unbrikd/edge-leap/internal/configuration"
 	"github.com/unbrikd/edge-leap/internal/controller"
-	"github.com/unbrikd/edge-leap/internal/releaser"
 )
 
 var manifest, image, createOpts, startupOrder, targetCondition, token, deploymentId string
@@ -62,18 +63,30 @@ func executeRelease() {
 		cfg.Auth.Token = token
 	}
 
-	ctlr := controller.New(cfg, "Azure")
-	rel := releaser.New(ctlr)
+	c := controller.NewClient(nil)
+	c.WithAuthToken(token)
+	c.BaseURL, _ = url.Parse(fmt.Sprintf("https://%s.azure-devices.net/", cfg.Infra.Hub))
 
-	d := controller.Deployment{
-		Id:              deploymentId,
-		Priority:        priority,
-		TargetCondition: targetCondition,
-		ManifestPath:    manifest,
-	}
-
-	if err = rel.ReleaseModule(d); err != nil {
-		fmt.Printf("failed to release module: %v", err)
+	m, err := c.Configurations.GetConfiguration(context.Background(), deploymentId)
+	if err != nil {
+		fmt.Printf("failed to get layered deployment: %v", err)
 		return
 	}
+
+	fmt.Println(m)
+
+	// ctlr := controller.New(cfg, "Azure")
+	// rel := releaser.New(ctlr)
+
+	// d := controller.Deployment{
+	// 	Id:              deploymentId,
+	// 	Priority:        priority,
+	// 	TargetCondition: targetCondition,
+	// 	ManifestPath:    manifest,
+	// }
+
+	// if err = rel.ReleaseModule(d); err != nil {
+	// 	fmt.Printf("failed to release module: %v", err)
+	// 	return
+	// }
 }
