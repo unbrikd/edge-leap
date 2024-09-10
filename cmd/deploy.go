@@ -8,7 +8,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/unbrikd/edge-leap/internal/configuration"
-	"github.com/unbrikd/edge-leap/internal/controller"
 )
 
 // deployCmd represents the deploy command
@@ -50,20 +49,20 @@ var moduleCmd = &cobra.Command{
 	Use:   "module",
 	Short: "Deploy the module in the device",
 	Run: func(cmd *cobra.Command, args []string) {
-		c, err := configuration.Load(file)
+		_, err := configuration.Load(file)
 		if err != nil {
 			fmt.Printf("failed to load configuration: %v\n", err)
 			return
 		}
 
-		ctl := controller.New(c, "azure")
+		// ctl := controller.New(c, "azure")
 
-		if err = ctl.UpdateDeviceTwin(c.Device.Name, map[string]string{c.Module.Name: c.Id}); err != nil {
-			fmt.Printf("failed to update device twin: %v\n", err)
-			return
-		}
+		// if err = ctl.UpdateDeviceTwin(c.Device.Name, map[string]string{c.Module.Name: c.Id}); err != nil {
+		// 	fmt.Printf("failed to update device twin: %v\n", err)
+		// 	return
+		// }
 
-		fmt.Printf("%s: %s\n", c.Module.Name, c.Id)
+		// fmt.Printf("%s: %s\n", c.Module.Name, c.Id)
 	},
 }
 
