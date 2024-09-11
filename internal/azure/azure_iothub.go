@@ -3,7 +3,6 @@ package azure
 import (
 	"context"
 	"fmt"
-	"net/http"
 )
 
 type ConfigurationsService service
@@ -26,64 +25,56 @@ type Configuration struct {
 
 // GetConfiguration retrieves a configuration from the Azure IoT Hub. A configuration object is returned if the
 // operation is successful, otherwise an error is returned and the configuration object is nil.
-func (s *ConfigurationsService) GetConfiguration(ctx context.Context, id string) (*Configuration, error) {
+func (s *ConfigurationsService) GetConfiguration(ctx context.Context, id string) (*Configuration, *Response, error) {
 	u := fmt.Sprintf("configurations/%s?api-version=2021-04-12", id)
 
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	c := new(Configuration)
-	_, err = s.client.Do(req, c)
+	res, err := s.client.Do(req, c)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return c, err
+	return c, &Response{res}, err
 }
 
-func (s *ConfigurationsService) CreateConfiguration(ctx context.Context, c Configuration) (*Configuration, error) {
+func (s *ConfigurationsService) CreateConfiguration(ctx context.Context, c Configuration) (*Configuration, *Response, error) {
 	u := fmt.Sprintf("configurations/%s?api-version=2021-04-12", c.Id)
 
 	req, err := s.client.NewRequest("PUT", u, c)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	cNew := new(Configuration)
-	_, err = s.client.Do(req, cNew)
+	res, err := s.client.Do(req, cNew)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return cNew, err
+	return cNew, &Response{res}, nil
 }
 
 // DeleteConfiguration deletes a configuration from the Azure IoT Hub. An error is returned if the operation is not
 // successful.
-func (s *ConfigurationsService) DeleteConfiguration(id string) error {
+func (s *ConfigurationsService) DeleteConfiguration(id string) (*Response, error) {
 	u := fmt.Sprintf("configurations/%s?api-version=2021-04-12", id)
 
 	req, err := s.client.NewRequest("DELETE", u, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	res, err := s.client.Do(req, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if res.StatusCode == http.StatusUnauthorized {
-		return fmt.Errorf("unauthorized, please set a valid token")
-	}
-
-	if res.StatusCode != http.StatusNoContent && res.StatusCode != http.StatusNotFound {
-		return fmt.Errorf("unexpected hub behaviour: %v", res.Status)
-	}
-
-	return nil
+	return &Response{res}, nil
 }
 
 func (c *Configuration) SetContent(mod, img, opts, so string) {

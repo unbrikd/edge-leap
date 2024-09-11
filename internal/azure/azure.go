@@ -20,6 +20,10 @@ type Client struct {
 	Configurations *ConfigurationsService
 }
 
+type Response struct {
+	Response *http.Response
+}
+
 // service is a genetic struct that abstracts the interaction with Azure resources API.
 type service struct {
 	client  *Client
@@ -116,10 +120,27 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	}
 	defer res.Body.Close()
 
-	err = json.NewDecoder(res.Body).Decode(v)
-	if err != nil && err != io.EOF {
-		return nil, err
+	if v != nil {
+		err = json.NewDecoder(res.Body).Decode(v)
+		if err != nil && err != io.EOF {
+			return nil, err
+		}
 	}
 
 	return res, nil
+}
+
+func (r *Response) Expect(statusCode ...int) error {
+	// check if response status code is in the list of expected status codes
+	for _, code := range statusCode {
+		if r.Response.StatusCode == code {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("%s", r.Response.Status)
+}
+
+func (r *Response) Is(statusCode int) bool {
+	return r.Response.StatusCode == statusCode
 }

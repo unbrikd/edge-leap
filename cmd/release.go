@@ -63,8 +63,7 @@ func init() {
 }
 
 func executeRelease() {
-	c := azure.NewClient(nil)
-	c.WithAuthToken(config.Auth.Token)
+	c := azure.NewClient(nil).WithAuthToken(config.Auth.Token)
 	c.BaseURL, _ = url.Parse(fmt.Sprintf("https://%s.azure-devices.net/", config.Infra.Hub))
 
 	d := azure.Configuration{
