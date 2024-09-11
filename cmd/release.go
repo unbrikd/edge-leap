@@ -79,6 +79,4 @@ func executeRelease() {
 		fmt.Printf("failed to release module: %v", err)
 		return
 	}
-
-	fmt.Printf("%s\n", config.Deployment.Id)
 }

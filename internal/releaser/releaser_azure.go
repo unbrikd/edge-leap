@@ -45,6 +45,5 @@ func (az *AzureReleaser) ReleaseModule(c *azure.Configuration) error {
 		return err
 	}
 
-	fmt.Printf("Module %s released\n", c.Id)
 	return nil
 }

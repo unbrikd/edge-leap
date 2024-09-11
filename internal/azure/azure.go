@@ -130,6 +130,8 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	return res, nil
 }
 
+// Expect checks if the response status code is in the list of expected status codes. If the status code is not in the
+// list, an error is returned with the response status message.
 func (r *Response) Expect(statusCode ...int) error {
 	// check if response status code is in the list of expected status codes
 	for _, code := range statusCode {
@@ -141,6 +143,7 @@ func (r *Response) Expect(statusCode ...int) error {
 	return fmt.Errorf("%s", r.Response.Status)
 }
 
+// Is checks if the response status code is equal to the provided status code.
 func (r *Response) Is(statusCode int) bool {
 	return r.Response.StatusCode == statusCode
 }
