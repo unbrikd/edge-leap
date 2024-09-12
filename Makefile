@@ -1,47 +1,70 @@
 # Build metadata
-GIT_COMMIT=$(shell git rev-parse --short HEAD)
+APPLICATION_NAME := "elcli"
 APPLICATION_VERSION := "0.1.0"
+APPLICATION_BUILDID=$(shell git rev-parse --short HEAD)
+APPLICATION_ARCH := ""
 
-# Docker build variables
-DOCKERFILE := "./docker/Dockerfile"
-
-# Golang build variables
-GOOS := ""
-GOARCH := ""
+# Golang build parameters
+GO_OS := ""
+GO_ARCH := ""
 GO_PKG := "github.com/unbrikd/edge-leap"
-DESTDIR := "./bin"
+GO_BINDIR := "./bin"
+GO_EXTENSION := ""
+
+# Docker build parameters
+DOCKER_REPO := "ghcr.io/unbrikd/elcli"
+DOCKER_FILE := "./docker/Dockerfile"
+DOCKER_OPTS := --build-arg APPLICATION_VERSION=$(APPLICATION_VERSION) --build-arg APPLICATION_BUILDID=$(APPLICATION_BUILDID) --build-arg GO_PKG=$(GO_PKG) $(DOCKER_EXTRAOPTS)
+DOCKER_EXTRAOPTS := ""
+DOCKER_CONTEXT := "."
+
+docker-buildx:
+	@echo "---> Building docker image for linux/amd64 and linux/arm64"
+	@docker buildx build \
+	--push \
+    $(DOCKER_OPTS) \
+    --tag ghcr.io/unbrikd/$(APPLICATION_NAME):latest \
+    --tag ghcr.io/unbrikd/$(APPLICATION_NAME):$(APPLICATION_VERSION)\
+    -f $(DOCKER_FILE) .
+
+docker-buildx-allarch:
+	@echo "---> Building docker image for linux/amd64 and linux/arm64"
+	@$(MAKE) docker-buildx DOCKER_EXTRAOPTS="--platform linux/amd64,linux/arm64"
 
 docker-image:
-	@echo "---> Building docker image for $(GOOS)/$(GOARCH)"
-	@docker build --build-arg GOOS=$(GOOS) --build-arg GOARCH=$(GOARCH) -t elcli -f $(DOCKERFILE) .
+	@echo "---> Building docker image $(DOCKER_REPO):${APPLICATION_VERSION}-$(APPLICATION_BUILDID)$(APPLICATION_ARCH)"
+	@docker build \
+	$(DOCKER_OPTS) \
+	-t $(DOCKER_REPO):${APPLICATION_VERSION}-$(APPLICATION_BUILDID)$(APPLICATION_ARCH) \
+	-f $(DOCKER_FILE) .
 
 build:
-	@echo "---> $(DESTDIR)/elcli-v$(APPLICATION_VERSION).${GOOS}-${GOARCH}$(EXTENSION)"
-	@GOOS=$(GOOS) GOARCH=$(GOARCH) go build \
-		-ldflags "-s -w -X $(GO_PKG)/version.Version=$(APPLICATION_VERSION) -X $(GO_PKG)/version.Revision=$(GIT_COMMIT)" \
-		-o $(DESTDIR)/elcli-v$(APPLICATION_VERSION).${GOOS}-${GOARCH}$(EXTENSION)
+	@echo "---> $(GO_BINDIR)/elcli-v$(APPLICATION_VERSION).${GO_OS}-${GO_ARCH}$(EXTENSION)"
+	@GOOS=$(GO_OS) GOARCH=$(GO_ARCH) go build \
+		-ldflags "-s -w -X $(GO_PKG)/version.Version=$(APPLICATION_VERSION) -X $(GO_PKG)/version.Revision=$(APPLICATION_BUILDID)" \
+		-o $(GO_BINDIR)/elcli-v$(APPLICATION_VERSION).${GO_OS}-${GO_ARCH}$(GO_EXTENSION)
 
 build-macos:
 	@echo "---> Building for darwin/amd64"
-	@$(MAKE) build GOOS=darwin GOARCH=amd64
+	@$(MAKE) build GO_OS=darwin GO_ARCH=amd64 GO_BINDIR=$(GO_BINDIR)
 
 	@echo "---> Building for darwin/arm64"
-	@$(MAKE) build GOOS=darwin GOARCH=arm64
+	@$(MAKE) build GO_OS=darwin GO_ARCH=arm64 GO_BINDIR=$(GO_BINDIR)
 
 build-linux:
 	@echo "---> Building for linux/amd64"
-	@$(MAKE) build GOOS=linux GOARCH=amd64
+	@$(MAKE) build GO_OS=linux GO_ARCH=amd64 GO_BINDIR=$(GO_BINDIR)
 
 	@echo "---> Building for linux/arm64"
-	@$(MAKE) build GOOS=linux GOARCH=arm64
+	@$(MAKE) build GO_OS=linux GO_ARCH=arm64 GO_BINDIR=$(GO_BINDIR)
 
 build-windows:
 	@echo "---> Building for windows/amd64"
-	@$(MAKE) build GOOS=windows GOARCH=amd64 EXTENSION=".exe"
+	@$(MAKE) build GO_OS=windows GO_ARCH=amd64 GO_EXTENSION=".exe" GO_BINDIR=$(GO_BINDIR)
 
 print-version:
 	@echo $(APPLICATION_VERSION)
 
 clean:
 	@echo "---> Cleaning up"
-	@rm -rf $(DESTDIR)/*
+	@echo "$(GO_BINDIR)/*" && rm -rf $(GO_BINDIR)/*

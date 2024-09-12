@@ -1,16 +1,20 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/unbrikd/edge-leap/internal/configuration"
 	"github.com/unbrikd/edge-leap/internal/utils"
 )
 
 const DEFAULT_CONFIG_FILE = "./edge-leap.yaml"
 
-var file string
+var cfgFile string
 var force bool
+var config configuration.Configuration
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -33,7 +37,19 @@ func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
 	rootCmd.PersistentFlags().StringVarP(
-		&file, "file", "f", utils.GetEnv("EL_CONFIG_FILE", DEFAULT_CONFIG_FILE), "configuration file")
+		&cfgFile, "file", "f", utils.GetEnv("EL_CONFIG_FILE", DEFAULT_CONFIG_FILE), "configuration file")
 
 	rootCmd.PersistentFlags().BoolVar(&force, "force", false, "force the command to proceed")
+}
+
+func initConfig() {
+	viper.SetConfigFile(cfgFile)
+
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Printf("Using config file: %s\n", cfgFile)
+	} else {
+		fmt.Println("No config file found, using flags only")
+	}
+
+	viper.Unmarshal(&config)
 }

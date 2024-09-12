@@ -17,10 +17,11 @@ on:
 jobs:
   prepare:
     uses: ./.github/workflows/prepare.yml
-  
+
   build:
     needs: prepare
     uses: ./.github/workflows/build.yml
+    secrets: inherit
 
   release:
     needs: build

@@ -1,0 +1,86 @@
+package releaser
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+
+	"github.com/unbrikd/edge-leap/internal/azure"
+)
+
+type AzureReleaser struct {
+	// Azure client
+	Client *azure.Client
+}
+
+func (az *AzureReleaser) ReleaseModule(c *azure.Configuration) error {
+	fmt.Printf("Releasing module %s\n", c.Id)
+	currentConfig, err := az.configurationExists(c.Id)
+	if err != nil {
+		return err
+	}
+
+	if currentConfig != nil {
+		fmt.Printf("Configuration %s already exists, deleting it\n", c.Id)
+		err = az.configurationAttemptDelete(c.Id)
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Printf("Creating configuration %s\n", c.Id)
+	err = az.configurationAttemptCreate(c)
+	if err != nil {
+		if currentConfig != nil {
+			fmt.Printf("Rolling back to previous configuration for %s due to errors\n", c.Id)
+			az.configurationAttemptCreate(currentConfig)
+		}
+
+		return err
+	}
+
+	return nil
+}
+
+func (az *AzureReleaser) configurationExists(id string) (*azure.Configuration, error) {
+	c, res, err := az.Client.Configurations.GetConfiguration(context.Background(), id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = res.Expect(http.StatusOK, http.StatusNotFound); err != nil {
+		return nil, err
+	}
+
+	if res.Is(http.StatusNotFound) {
+		return nil, nil
+	}
+
+	return c, nil
+}
+
+func (az *AzureReleaser) configurationAttemptCreate(c *azure.Configuration) error {
+	_, res, err := az.Client.Configurations.CreateConfiguration(context.Background(), *c)
+	if err != nil {
+		return err
+	}
+
+	if err = res.Expect(http.StatusOK); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (az *AzureReleaser) configurationAttemptDelete(id string) error {
+	res, err := az.Client.Configurations.DeleteConfiguration(id)
+	if err != nil {
+		return err
+	}
+
+	if err = res.Expect(http.StatusNoContent); err != nil {
+		return err
+	}
+
+	return nil
+}
