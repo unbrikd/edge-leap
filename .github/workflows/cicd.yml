@@ -23,13 +23,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        
+
       - name: deleteimg
         uses: actions/delete-package-versions@v2
         with:
           token: ${{ secrets.UNBKD_CICD_TOKEN }}
-          packages: 'unbrikd/*'
-          versions: '*'
+          package-version-ids: "*"
+          package-name: "elcli"
+          owner: "unbrikd"
+          repo: "elcli"
 
   # build:
   #   needs: prepare
