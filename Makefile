@@ -1,6 +1,6 @@
 # Build metadata
 APPLICATION_NAME := "elcli"
-APPLICATION_VERSION := "0.2.0"
+APPLICATION_VERSION := "0.1.0"
 APPLICATION_BUILDID=$(shell git rev-parse --short HEAD)
 APPLICATION_ARCH := ""
 
@@ -46,21 +46,21 @@ build:
 
 build-macos:
 	@echo "---> Building for darwin/amd64"
-	@$(MAKE) build GO_OS=darwin GO_ARCH=amd64
+	@$(MAKE) build GO_OS=darwin GO_ARCH=amd64 GO_BINDIR=$(GO_BINDIR)
 
 	@echo "---> Building for darwin/arm64"
-	@$(MAKE) build GO_OS=darwin GO_ARCH=arm64
+	@$(MAKE) build GO_OS=darwin GO_ARCH=arm64 GO_BINDIR=$(GO_BINDIR)
 
 build-linux:
 	@echo "---> Building for linux/amd64"
-	@$(MAKE) build GO_OS=linux GO_ARCH=amd64
+	@$(MAKE) build GO_OS=linux GO_ARCH=amd64 GO_BINDIR=$(GO_BINDIR)
 
 	@echo "---> Building for linux/arm64"
-	@$(MAKE) build GO_OS=linux GO_ARCH=arm64
+	@$(MAKE) build GO_OS=linux GO_ARCH=arm64 GO_BINDIR=$(GO_BINDIR)
 
 build-windows:
 	@echo "---> Building for windows/amd64"
-	@$(MAKE) build GO_OS=windows GO_ARCH=amd64 GO_EXTENSION=".exe"
+	@$(MAKE) build GO_OS=windows GO_ARCH=amd64 GO_EXTENSION=".exe" GO_BINDIR=$(GO_BINDIR)
 
 print-version:
 	@echo $(APPLICATION_VERSION)

@@ -17,17 +17,15 @@ jobs:
     
     - name: Linux
       run: |
-        make build GOOS="linux" GOARCH="amd64" DESTDIR=${{ env.DESTDIR }}
-        make build GOOS="linux" GOARCH="arm64" DESTDIR=${{ env.DESTDIR }}
+        make build-linux GO_BINDIR=${{ env.DESTDIR }}
       
     - name: MacOS
       run: |
-        make build GOOS="darwin" GOARCH="amd64" DESTDIR=${{ env.DESTDIR }}
-        make build GOOS="darwin" GOARCH="arm64" DESTDIR=${{ env.DESTDIR }}
+        make build-macos GO_BINDIR=${{ env.DESTDIR }}
     
     - name: Windows
       run: |
-        make build GOOS="windows" GOARCH="amd64" EXTENSION=".exe" DESTDIR=${{ env.DESTDIR }}
+        make build-windows GO_BINDIR=${{ env.DESTDIR }}
     
     - name: Upload
       uses: actions/upload-artifact@v4
@@ -35,25 +33,3 @@ jobs:
         name: assets
         path: "${{ env.DESTDIR }}"
         if-no-files-found: error
-  
-  docker:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
-      - name: Set release version
-        run: |
-          version=$(make print-version)
-          echo "APPLICATION_VERSION=${version}" >> $GITHUB_ENV
-
-      - name: Login to ghcr
-        run: docker login ghcr.io -u unbrikd --password ${{ secrets.UNBKD_CICD_TOKEN }}
-
-      - name: Set up docker buildx
-        uses: docker/setup-buildx-action@v2
-      
-      - name: Build and push multiarch image
-        run: |
-          make docker-buildx-allarch
