@@ -69,7 +69,7 @@ jobs:
             --tag ghcr.io/unbrikd/elcli:manifest-latest \
             ghcr.io/unbrikd/elcli:latest
       
-            - name: Create and push Docker manifest
+      - name: Create and push Docker manifest
         run: |
           docker buildx imagetools create \
             --tag ghcr.io/unbrikd/elcli:manifest-${{ env.APPLICATION_VERSION }} \
