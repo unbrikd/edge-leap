@@ -60,7 +60,6 @@ jobs:
             --platform linux/amd64,linux/arm64 \
             --push \
             --tag ghcr.io/unbrikd/elcli:latest \
-            --tag ghcr.io/unbrikd/elcli:${{ env.APPLICATION_VERSION }} \
             -f ./docker/Dockerfile .
 
       - name: Create and push Docker manifest
@@ -68,9 +67,3 @@ jobs:
           docker buildx imagetools create \
             --tag ghcr.io/unbrikd/elcli:manifest-latest \
             ghcr.io/unbrikd/elcli:latest
-      
-      - name: Create and push Docker manifest
-        run: |
-          docker buildx imagetools create \
-            --tag ghcr.io/unbrikd/elcli:manifest-${{ env.APPLICATION_VERSION }} \
-            ghcr.io/unbrikd/elcli:${{ env.APPLICATION_VERSION }}
