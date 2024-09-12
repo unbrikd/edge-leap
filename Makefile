@@ -18,6 +18,20 @@ DOCKER_OPTS := --build-arg APPLICATION_VERSION=$(APPLICATION_VERSION) --build-ar
 DOCKER_EXTRAOPTS := ""
 DOCKER_CONTEXT := "."
 
+docker-prepare-buildx:
+	docker buildx create \
+	--name container-builder \
+	--driver docker-container \
+	--use --bootstrap
+
+docker-buildx:
+	docker buildx build \
+    --platform linux/amd64,linux/arm64 \
+    --push \
+    --tag ghcr.io/unbrikd/elcli:latest \
+    --tag ghcr.io/unbrikd/elcli:0.3.0 \
+    -f ./docker/Dockerfile .
+
 docker-image:
 	@echo "---> Building docker image $(DOCKER_REPO):${APPLICATION_VERSION}-$(APPLICATION_BUILDID)$(APPLICATION_ARCH)"
 	@docker build $(DOCKER_OPTS) -t $(DOCKER_REPO):${APPLICATION_VERSION}-$(APPLICATION_BUILDID)$(APPLICATION_ARCH) -f $(DOCKER_FILE) .
