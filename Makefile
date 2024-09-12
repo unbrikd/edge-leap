@@ -2,6 +2,7 @@
 APPLICATION_NAME := "elcli"
 APPLICATION_VERSION := "0.2.0"
 APPLICATION_BUILDID=$(shell git rev-parse --short HEAD)
+APPLICATION_ARCH := ""
 
 # Golang build parameters
 GO_OS := ""
@@ -11,14 +12,23 @@ GO_BINDIR := "./bin"
 GO_EXTENSION := ""
 
 # Docker build parameters
+DOCKER_REPO := "ghcr.io/unbrikd/elcli"
 DOCKER_FILE := "./docker/Dockerfile"
-DOCKER_OPTS := --build-arg APPLICATION_VERSION=$(APPLICATION_VERSION) --build-arg APPLICATION_BUILDID=$(APPLICATION_BUILDID) --build-arg GO_PKG=$(GO_PKG) $(DOCKER_BUILD_EXTRAOPTS)
-DOCKER_BUILD_EXTRAOPTS := ""
+DOCKER_OPTS := --build-arg APPLICATION_VERSION=$(APPLICATION_VERSION) --build-arg APPLICATION_BUILDID=$(APPLICATION_BUILDID) --build-arg GO_PKG=$(GO_PKG) $(DOCKER_EXTRAOPTS)
+DOCKER_EXTRAOPTS := ""
 DOCKER_CONTEXT := "."
 
 docker-image:
-	@echo "---> Building docker image elcli:${APPLICATION_VERSION}-$(APPLICATION_BUILDID)"
-	@docker build $(DOCKER_OPTS) -t elcli:${APPLICATION_VERSION}-$(APPLICATION_BUILDID) -f $(DOCKER_FILE) .
+	@echo "---> Building docker image $(DOCKER_REPO):${APPLICATION_VERSION}-$(APPLICATION_BUILDID)$(APPLICATION_ARCH)"
+	@docker build $(DOCKER_OPTS) -t $(DOCKER_REPO):${APPLICATION_VERSION}-$(APPLICATION_BUILDID)$(APPLICATION_ARCH) -f $(DOCKER_FILE) .
+
+docker-linux:
+	@echo "---> Building docker image for linux/amd64"
+	@$(MAKE) docker-image DOCKER_EXTRAOPTS="--platform linux/amd64" APPLICATION_ARCH="-amd64"
+
+	@echo "---> Building docker image for linux/arm64"
+	@$(MAKE) docker-image DOCKER_EXTRAOPTS="--platform linux/arm64" APPLICATION_ARCH="-arm64"
+
 
 build:
 	@echo "---> $(GO_BINDIR)/elcli-v$(APPLICATION_VERSION).${GO_OS}-${GO_ARCH}$(EXTENSION)"
@@ -44,8 +54,8 @@ build-windows:
 	@echo "---> Building for windows/amd64"
 	@$(MAKE) build GO_OS=windows GO_ARCH=amd64 GO_EXTENSION=".exe"
 
-show-version:
-	@echo "v$(APPLICATION_VERSION), build $(APPLICATION_BUILDID)"
+print-version:
+	@echo $(APPLICATION_VERSION)
 
 clean:
 	@echo "---> Cleaning up"
