@@ -50,7 +50,7 @@ jobs:
 
 
       - name: Log in to GitHub Docker Registry
-        run: docker login ghcr.io -u unbrikd --password ${{ secrets.GHCR_TOKEN }}
+        run: docker login ghcr.io -u unbrikd --password "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"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
