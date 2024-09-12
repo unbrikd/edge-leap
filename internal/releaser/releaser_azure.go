@@ -15,33 +15,67 @@ type AzureReleaser struct {
 
 func (az *AzureReleaser) ReleaseModule(c *azure.Configuration) error {
 	fmt.Printf("Releasing module %s\n", c.Id)
-	_, res, err := az.Client.Configurations.GetConfiguration(context.Background(), c.Id)
+	currentConfig, err := az.configurationExists(c.Id)
 	if err != nil {
 		return err
 	}
 
-	if err = res.Expect(200, 404); err != nil {
-		return err
-	}
-
-	if res.Is(200) {
-		fmt.Printf("Module %s already exists, deleting\n", c.Id)
-		res, err = az.Client.Configurations.DeleteConfiguration(c.Id)
+	if currentConfig != nil {
+		fmt.Printf("Configuration %s already exists, deleting it\n", c.Id)
+		err = az.configurationAttemptDelete(c.Id)
 		if err != nil {
 			return err
 		}
-		if err = res.Expect(http.StatusNoContent); err != nil {
-			return err
-		}
 	}
 
-	fmt.Printf("Creating module %s\n", c.Id)
-	_, res, err = az.Client.Configurations.CreateConfiguration(context.Background(), *c)
+	fmt.Printf("Creating configuration %s\n", c.Id)
+	err = az.configurationAttemptCreate(c)
+	if err != nil {
+		fmt.Printf("Rolling back to previous configuration for %s due to errors\n", c.Id)
+		az.configurationAttemptCreate(currentConfig)
+		return err
+	}
+
+	return nil
+}
+
+func (az *AzureReleaser) configurationExists(id string) (*azure.Configuration, error) {
+	c, res, err := az.Client.Configurations.GetConfiguration(context.Background(), id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = res.Expect(http.StatusOK, http.StatusNotFound); err != nil {
+		return nil, err
+	}
+
+	if res.Is(http.StatusNotFound) {
+		return nil, nil
+	}
+
+	return c, nil
+}
+
+func (az *AzureReleaser) configurationAttemptCreate(c *azure.Configuration) error {
+	_, res, err := az.Client.Configurations.CreateConfiguration(context.Background(), *c)
 	if err != nil {
 		return err
 	}
 
-	if err = res.Expect(200); err != nil {
+	if err = res.Expect(http.StatusOK); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (az *AzureReleaser) configurationAttemptDelete(id string) error {
+	res, err := az.Client.Configurations.DeleteConfiguration(id)
+	if err != nil {
+		return err
+	}
+
+	if err = res.Expect(http.StatusNoContent); err != nil {
 		return err
 	}
 

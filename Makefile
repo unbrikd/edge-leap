@@ -13,7 +13,7 @@ DESTDIR := "./bin"
 
 docker-image:
 	@echo "---> Building docker image for $(GOOS)/$(GOARCH)"
-	@docker build --build-arg GOOS=$(GOOS) --build-arg GOARCH=$(GOARCH) -t elcli -f $(DOCKERFILE) .
+	@docker build --platform=$(GOOS)/$(GOARCH) -t elcli -f $(DOCKERFILE) .
 
 build:
 	@echo "---> $(DESTDIR)/elcli-v$(APPLICATION_VERSION).${GOOS}-${GOARCH}$(EXTENSION)"
