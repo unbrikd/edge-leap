@@ -29,7 +29,7 @@ docker-buildx:
     --platform linux/amd64,linux/arm64 \
     --push \
     --tag ghcr.io/unbrikd/elcli:latest \
-    --tag ghcr.io/unbrikd/elcli:0.3.0 \
+    --tag ghcr.io/unbrikd/elcli:0.2.0 \
     -f ./docker/Dockerfile .
 
 docker-image:
