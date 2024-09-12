@@ -17,8 +17,8 @@ DOCKER_BUILD_EXTRAOPTS := ""
 DOCKER_CONTEXT := "."
 
 docker-image:
-	@echo "---> Building docker image elcli:${APPLICATION_VERSION}"
-	docker build $(DOCKER_OPTS) -t elcli:${APPLICATION_VERSION} -f $(DOCKER_FILE) .
+	@echo "---> Building docker image elcli:${APPLICATION_VERSION}-$(APPLICATION_BUILDID)"
+	@docker build $(DOCKER_OPTS) -t elcli:${APPLICATION_VERSION}-$(APPLICATION_BUILDID) -f $(DOCKER_FILE) .
 
 build:
 	@echo "---> $(GO_BINDIR)/elcli-v$(APPLICATION_VERSION).${GO_OS}-${GO_ARCH}$(EXTENSION)"
