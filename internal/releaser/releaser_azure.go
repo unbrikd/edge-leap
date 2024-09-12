@@ -31,8 +31,11 @@ func (az *AzureReleaser) ReleaseModule(c *azure.Configuration) error {
 	fmt.Printf("Creating configuration %s\n", c.Id)
 	err = az.configurationAttemptCreate(c)
 	if err != nil {
-		fmt.Printf("Rolling back to previous configuration for %s due to errors\n", c.Id)
-		az.configurationAttemptCreate(currentConfig)
+		if currentConfig != nil {
+			fmt.Printf("Rolling back to previous configuration for %s due to errors\n", c.Id)
+			az.configurationAttemptCreate(currentConfig)
+		}
+
 		return err
 	}
 
