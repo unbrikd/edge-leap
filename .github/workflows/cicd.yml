@@ -30,6 +30,7 @@ jobs:
           token: ${{ secrets.UNBKD_CICD_TOKEN }}
           package-name: "elcli"
           owner: "unbrikd"
+          repo: "elcli"
 
   # build:
   #   needs: prepare
