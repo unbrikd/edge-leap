@@ -27,7 +27,7 @@ func init() {
 	releaseCmd.Flags().StringVarP(&config.Deployment.CreateOptions, "create-options", "c", "", "Options to set how the module is initialized from iotedge")
 	viper.BindPFlag("module.createOptions", releaseCmd.Flags().Lookup("create-options"))
 
-	releaseCmd.Flags().StringVarP(&config.Module.Name, "module.name", "m", "", "Module name as shown in iotedge list command")
+	releaseCmd.Flags().StringVarP(&config.Module.Name, "module-name", "m", "", "Module name as shown in iotedge list command")
 	viper.BindPFlag("module.name", releaseCmd.Flags().Lookup("module.name"))
 
 	// Deployment configuration
