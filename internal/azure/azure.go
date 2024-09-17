@@ -18,10 +18,17 @@ type Client struct {
 	BaseURL *url.URL
 	// Configurations service for the Azure IoT Hub API.
 	Configurations *ConfigurationsService
+	// Devices service for the Azure IoT Hub API.
+	Devices *DevicesService
 }
 
 type Response struct {
 	Response *http.Response
+}
+
+type ErrorResponse struct {
+	Message          string `json:"Message"`
+	ExceptionMessage string `json:"ExceptionMessage"`
 }
 
 // service is a genetic struct that abstracts the interaction with Azure resources API.
@@ -48,6 +55,7 @@ func (c *Client) initialize() {
 		c.BaseURL, _ = url.Parse("https://azure.devices.net/")
 	}
 	c.Configurations = &ConfigurationsService{client: c, BaseURL: c.BaseURL}
+	c.Devices = &DevicesService{client: c, BaseURL: c.BaseURL}
 }
 
 // WithAuthToken sets the Authorization header for the client.

@@ -37,7 +37,7 @@ func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
 	rootCmd.PersistentFlags().StringVarP(
-		&cfgFile, "file", "f", utils.GetEnv("EL_CONFIG_FILE", DEFAULT_CONFIG_FILE), "configuration file")
+		&cfgFile, "config", "c", utils.GetEnv("EL_CONFIG_FILE", DEFAULT_CONFIG_FILE), "configuration file")
 
 	rootCmd.PersistentFlags().BoolVar(&force, "force", false, "force the command to proceed")
 }
@@ -48,8 +48,12 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Printf("Using config file: %s\n", cfgFile)
 	} else {
-		fmt.Println("No config file found, using flags only")
+		fmt.Println("No configuration file found, using flags only")
 	}
 
-	viper.Unmarshal(&config)
+	if err := viper.Unmarshal(&config); err != nil {
+		fmt.Printf("Error loading configuration: %v\n", err)
+		os.Exit(1)
+	}
+
 }

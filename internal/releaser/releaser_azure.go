@@ -42,6 +42,27 @@ func (az *AzureReleaser) ReleaseModule(c *azure.Configuration) error {
 	return nil
 }
 
+func (az *AzureReleaser) SetModuleOnDevice(deviceId, moduleName, moduleVersion string) error {
+	twinTags := map[string]interface{}{
+		"tags": map[string]interface{}{
+			"application": map[string]string{
+				moduleName: moduleVersion,
+			},
+		},
+	}
+
+	_, res, err := az.Client.Devices.UpdateTwinTags(deviceId, twinTags)
+	if err != nil {
+		return err
+	}
+
+	if err = res.Expect(http.StatusOK); err != nil {
+		return fmt.Errorf("failed to update the device twin: %v", res.Response.Header["Iothub-Errorcode"])
+	}
+
+	return nil
+}
+
 func (az *AzureReleaser) configurationExists(id string) (*azure.Configuration, error) {
 	c, res, err := az.Client.Configurations.GetConfiguration(context.Background(), id)
 	if err != nil {

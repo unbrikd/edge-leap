@@ -24,34 +24,31 @@ func init() {
 	rootCmd.AddCommand(releaseCmd)
 
 	// Module configuration
-	releaseCmd.Flags().StringVarP(&config.Deployment.CreateOptions, "create-options", "c", "", "Options to set how the module is initialized from iotedge")
-	viper.BindPFlag("module.createOptions", releaseCmd.Flags().Lookup("create-options"))
+	releaseCmd.Flags().StringVar(&config.Module.CreateOptions, "create-options", "", "Options to set how the module is initialized from iotedge")
+	viper.BindPFlag("module.create-options", releaseCmd.Flags().Lookup("create-options"))
 
 	releaseCmd.Flags().StringVarP(&config.Module.Name, "module-name", "m", "", "Module name as shown in iotedge list command")
-	viper.BindPFlag("module.name", releaseCmd.Flags().Lookup("module.name"))
+	viper.BindPFlag("module.name", releaseCmd.Flags().Lookup("module-name"))
+
+	releaseCmd.Flags().StringVarP(&config.Module.StartupOrder, "startup-order", "s", "50", "Startup order of the module")
+	viper.BindPFlag("module.startup-order", releaseCmd.Flags().Lookup("startup-order"))
 
 	// Deployment configuration
 	releaseCmd.Flags().StringVar(&config.Deployment.Id, "id", "", "Deployment id to release")
 	viper.BindPFlag("deployment.id", releaseCmd.Flags().Lookup("id"))
 
-	releaseCmd.Flags().StringVar(&config.Deployment.Manifest, "json-file", "", "Path to the manifest file")
-	viper.BindPFlag("deployment.manifest", releaseCmd.Flags().Lookup("json-file"))
-
 	releaseCmd.Flags().Int16VarP(&config.Deployment.Priority, "priority", "p", 10, "Priority of the module")
 	viper.BindPFlag("deployment.priority", releaseCmd.Flags().Lookup("priority"))
 
 	releaseCmd.Flags().StringVarP(&config.Deployment.TargetCondition, "target-condition", "t", "", "Target condition to set in the manifest")
-	viper.BindPFlag("deployment.targetCondition", releaseCmd.Flags().Lookup("target-condition"))
-
-	releaseCmd.Flags().StringVarP(&config.Deployment.StartupOrder, "startup-order", "s", "50", "Startup order of the module")
-	viper.BindPFlag("deployment.startupOrder", releaseCmd.Flags().Lookup("startup-order"))
+	viper.BindPFlag("deployment.target-condition", releaseCmd.Flags().Lookup("target-condition"))
 
 	// Image configuration
 	releaseCmd.Flags().StringVarP(&config.Image.Repo, "image", "i", "", "Docker image to set in the manifest")
 	viper.BindPFlag("image.repo", releaseCmd.Flags().Lookup("image"))
 
-	releaseCmd.Flags().StringVar(&config.Image.Tag, "tag", "latest", "Docker image tag to set in the manifest")
-	viper.BindPFlag("image.tag", releaseCmd.Flags().Lookup("tag"))
+	releaseCmd.Flags().StringVar(&config.Image.Tag, "image-tag", "latest", "Docker image tag to set in the manifest")
+	viper.BindPFlag("image.tag", releaseCmd.Flags().Lookup("image-tag"))
 
 	// Infra configuration
 	releaseCmd.Flags().StringVar(&config.Infra.Hub, "hub", "", "IoT Hub name")
@@ -71,7 +68,7 @@ func executeRelease() {
 		Priority:        config.Deployment.Priority,
 		TargetCondition: config.Deployment.TargetCondition,
 	}
-	d.SetContent(config.Module.Name, config.Image.Repo, config.Deployment.CreateOptions, config.Deployment.StartupOrder)
+	d.SetContent(config.Module.Name, config.Image.Repo, config.Module.CreateOptions, config.Module.StartupOrder)
 
 	r := releaser.AzureReleaser{Client: c}
 	err := r.ReleaseModule(&d)
