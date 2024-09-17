@@ -50,7 +50,7 @@ func executeDraftDeploy() {
 	r := releaser.AzureReleaser{Client: c}
 	if err := r.SetModuleOnDevice(config.Device.Name, config.Module.Name, config.Id); err != nil {
 		fmt.Println(err)
-		return
+		os.Exit(1)
 	}
 
 	d := azure.Configuration{
@@ -62,6 +62,6 @@ func executeDraftDeploy() {
 
 	if err := r.ReleaseModule(&d); err != nil {
 		fmt.Println(err)
-		return
+		os.Exit(1)
 	}
 }
