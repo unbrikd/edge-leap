@@ -11,11 +11,11 @@ type Configuration struct {
 	// Module struct holds the module information.
 	Module struct {
 		// Name is the name of the module in the edge workload controller runtime.
-		Name string `mapstructure:"name"`
+		Name string `mapstructure:"name,omitempty"`
 		// StartupOrder is the startup order of the module in the cloud provider.
-		StartupOrder string `mapstructure:"startup-order"`
+		StartupOrder string `mapstructure:"startup-order,omitempty"`
 		// CreateOptions is the create options of the module in the cloud provider.
-		CreateOptions string `mapstructure:"create-options"`
+		CreateOptions string `mapstructure:"create-options,omitempty"`
 	} `mapstructure:"module"`
 
 	Deployment struct {

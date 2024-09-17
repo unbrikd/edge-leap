@@ -1,4 +1,4 @@
-package cmd
+package elcli
 
 import (
 	"fmt"
@@ -38,6 +38,7 @@ var newDraftCmd = &cobra.Command{
 			viper.SetConfigFile(cfgFile)
 		}
 
+		initConfig()
 		executeNewDraft()
 	},
 }
@@ -45,11 +46,6 @@ var newDraftCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(draftCmd)
 	draftCmd.AddCommand(newDraftCmd)
-
-	// Module configuration
-	newDraftCmd.Flags().StringVar(&config.Deployment.Id, "id", "", "development deployment ID")
-	newDraftCmd.MarkFlagRequired("id")
-	viper.BindPFlag("deployment.id", newDraftCmd.Flags().Lookup("id"))
 }
 
 func executeDraft() {
@@ -60,9 +56,7 @@ func executeNewDraft() {
 	id := strings.Split(uuid.New().String(), "-")[4]
 	viper.Set("session", id)
 	viper.Set("version", configuration.CONFIG_VERSION)
-	viper.Set("deployment.id", config.Deployment.Id)
 	viper.WriteConfig()
 
-	fmt.Printf("New draft session was initialized: %s\n", id)
-	fmt.Printf("Please edit the file '%s' accordingly.\n", cfgFile)
+	fmt.Println(id)
 }

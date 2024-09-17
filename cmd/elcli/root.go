@@ -1,4 +1,4 @@
-package cmd
+package elcli
 
 import (
 	"fmt"
@@ -44,12 +44,6 @@ func init() {
 
 func initConfig() {
 	viper.SetConfigFile(cfgFile)
-
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Printf("Using config file: %s\n", cfgFile)
-	} else {
-		fmt.Println("No configuration file found, using flags only")
-	}
 
 	if err := viper.Unmarshal(&config); err != nil {
 		fmt.Printf("Error loading configuration: %v\n", err)
