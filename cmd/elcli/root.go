@@ -25,7 +25,7 @@ unbrikd (c) 2024`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+// This is called by elcli.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
@@ -44,10 +44,33 @@ func init() {
 
 func initConfig() {
 	viper.SetConfigFile(cfgFile)
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Printf("Error reading configuration: %v\n", err)
+		os.Exit(1)
+	}
 
 	if err := viper.Unmarshal(&config); err != nil {
 		fmt.Printf("Error loading configuration: %v\n", err)
 		os.Exit(1)
 	}
 
+	fmt.Println("root init")
+	fmt.Println(config)
+}
+
+func LoadConfig() (*configuration.Configuration, error) {
+	viper.SetConfigFile(cfgFile)
+	viper.SetConfigType("yaml")
+
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Printf("Error reading configuration: %v\n", err)
+		return nil, err
+	}
+
+	if err := viper.Unmarshal(&config); err != nil {
+		fmt.Printf("Error loading configuration: %v\n", err)
+		return nil, err
+	}
+
+	return &config, nil
 }

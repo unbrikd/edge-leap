@@ -15,7 +15,7 @@ var draftDeployCmd = &cobra.Command{
 	Use:   "deploy",
 	Short: "Deploy a draft module",
 	Run: func(cmd *cobra.Command, args []string) {
-		initConfig()
+		LoadConfig()
 		preExecuteChecksDraftDeploy()
 		executeDraftDeploy()
 	},
@@ -24,14 +24,23 @@ var draftDeployCmd = &cobra.Command{
 func init() {
 	draftCmd.AddCommand(draftDeployCmd)
 
-	draftDeployCmd.Flags().StringVar(&config.Device.Name, "device-name", "", "Device name in the IoT Hub")
+	draftDeployCmd.Flags().StringVar(&config.Deployment.Id, "id", "", "Deployment ID")
+	viper.BindPFlag("deployment.id", draftDeployCmd.Flags().Lookup("id"))
+
+	draftDeployCmd.Flags().StringVar(&config.Device.Name, "device-name", viper.GetString("device.name"), "Device name in the IoT Hub")
 	viper.BindPFlag("device.name", draftDeployCmd.Flags().Lookup("device-name"))
 
-	draftDeployCmd.Flags().StringVar(&config.Device.Name, "module-name", "", "Module to be drafted")
+	draftDeployCmd.Flags().StringVar(&config.Device.Name, "module-name", viper.GetString("module.name"), "Module to be drafted")
 	viper.BindPFlag("module.name", draftDeployCmd.Flags().Lookup("module-name"))
 }
 
+// preExecuteChecksDraftDeploy checks if the required flags are set before executing the draft deploy command
 func preExecuteChecksDraftDeploy() {
+	if config.Deployment.Id == "" {
+		fmt.Println("error: deployment ID is required, use --id flag or set it in the configuration file")
+		os.Exit(1)
+	}
+
 	if config.Device.Name == "" {
 		fmt.Println("error: device name is required, use --device-name flag or set it in the configuration file")
 		os.Exit(1)

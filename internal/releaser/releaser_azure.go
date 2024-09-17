@@ -14,7 +14,6 @@ type AzureReleaser struct {
 }
 
 func (az *AzureReleaser) ReleaseModule(c *azure.Configuration) error {
-	fmt.Printf("Releasing module %s\n", c.Id)
 	currentConfig, err := az.configurationExists(c.Id)
 	if err != nil {
 		return err
@@ -28,11 +27,9 @@ func (az *AzureReleaser) ReleaseModule(c *azure.Configuration) error {
 		}
 	}
 
-	fmt.Printf("Creating configuration %s\n", c.Id)
 	err = az.configurationAttemptCreate(c)
 	if err != nil {
 		if currentConfig != nil {
-			fmt.Printf("Rolling back to previous configuration for %s due to errors\n", c.Id)
 			az.configurationAttemptCreate(currentConfig)
 		}
 

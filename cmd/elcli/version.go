@@ -7,7 +7,6 @@ import (
 	"github.com/unbrikd/edge-leap/version"
 )
 
-// versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Show the version of the edge leap client",
