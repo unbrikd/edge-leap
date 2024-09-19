@@ -36,10 +36,9 @@ func Execute() {
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
-	rootCmd.PersistentFlags().StringVarP(
-		&cfgFile, "config", "c", utils.GetEnv("EL_CONFIG_FILE", DEFAULT_CONFIG_FILE), "configuration file")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", utils.GetEnv("EL_CONFIG", DEFAULT_CONFIG_FILE), "configuration file")
 
-	rootCmd.PersistentFlags().BoolVar(&force, "force", false, "force the command to proceed")
+	rootCmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "force the command to proceed")
 }
 
 func loadConfig() (*configuration.Configuration, error) {

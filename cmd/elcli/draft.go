@@ -6,7 +6,7 @@ import (
 
 var draftCmd = &cobra.Command{
 	Use:   "draft",
-	Short: "Draft allows you to handle a new module deployment locally",
+	Short: "Start a new module draft session",
 	Run: func(cmd *cobra.Command, args []string) {
 		executeDraft()
 	},
