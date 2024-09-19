@@ -13,7 +13,7 @@ import (
 
 var newDraftCmd = &cobra.Command{
 	Use:   "new",
-	Short: "Sets a new draft session for a module",
+	Short: "Sets a new module draft configuration",
 	Run: func(cmd *cobra.Command, args []string) {
 		preExecuteChecksNewDraft()
 

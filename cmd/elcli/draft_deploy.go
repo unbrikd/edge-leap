@@ -28,34 +28,34 @@ func init() {
 	draftCmd.AddCommand(draftDeployCmd)
 
 	// Deployment configuration
-	draftDeployCmd.Flags().StringVar(&config.Deployment.Id, "id", viper.GetString("deployment.id"), "Deployment id to release")
+	draftDeployCmd.Flags().StringVar(&config.Deployment.Id, "id", viper.GetString("deployment.id"), "id to use for deployment (must be kebab-case)")
 	viper.BindPFlag("deployment.id", draftDeployCmd.Flags().Lookup("id"))
 
-	draftDeployCmd.Flags().Int16VarP(&config.Deployment.Priority, "priority", "p", 50, "Priority of the module")
+	draftDeployCmd.Flags().Int16VarP(&config.Deployment.Priority, "priority", "p", 50, "module deployment priority")
 	viper.BindPFlag("deployment.priority", draftDeployCmd.Flags().Lookup("priority"))
 
-	draftDeployCmd.Flags().StringVarP(&config.Deployment.TargetCondition, "target-condition", "t", viper.GetString("deployment.target-condition"), "Target condition to set in the manifest")
+	draftDeployCmd.Flags().StringVarP(&config.Deployment.TargetCondition, "target-condition", "t", viper.GetString("deployment.target-condition"), "target condition for the deployment")
 	viper.BindPFlag("deployment.target-condition", draftDeployCmd.Flags().Lookup("target-condition"))
 
 	// Device configuration
-	draftDeployCmd.Flags().StringVar(&config.Device.Name, "device-name", viper.GetString("device.name"), "Device name in the IoT Hub")
+	draftDeployCmd.Flags().StringVar(&config.Device.Name, "device-name", viper.GetString("device.name"), "device name to deploy the module to")
 	viper.BindPFlag("device.name", draftDeployCmd.Flags().Lookup("device-name"))
 
 	// Module configuration
-	draftDeployCmd.Flags().StringVarP(&config.Module.Name, "module-name", "m", viper.GetString("module.name"), "Module name as shown in iotedge list command")
+	draftDeployCmd.Flags().StringVarP(&config.Module.Name, "module-name", "m", viper.GetString("module.name"), "desired module name to show in the iotedge list (must be camelCase)")
 	viper.BindPFlag("module.name", draftDeployCmd.Flags().Lookup("module-name"))
 
-	draftDeployCmd.Flags().StringVar(&config.Module.CreateOptions, "create-options", viper.GetString("module.create-options"), "Options to set how the module is initialized from iotedge")
+	draftDeployCmd.Flags().StringVar(&config.Module.CreateOptions, "create-options", viper.GetString("module.create-options"), "module container settings when running the module (json string)")
 	viper.BindPFlag("module.create-options", draftDeployCmd.Flags().Lookup("create-options"))
 
-	draftDeployCmd.Flags().StringVarP(&config.Module.StartupOrder, "startup-order", "s", viper.GetString("module.startup-order"), "Startup order of the module")
+	draftDeployCmd.Flags().StringVarP(&config.Module.StartupOrder, "startup-order", "s", viper.GetString("module.startup-order"), "module startup order")
 	viper.BindPFlag("module.startup-order", draftDeployCmd.Flags().Lookup("startup-order"))
 
-	draftDeployCmd.Flags().StringVarP(&config.Module.Image, "image", "i", viper.GetString("module.image"), "Startup order of the module")
+	draftDeployCmd.Flags().StringVarP(&config.Module.Image, "image", "i", viper.GetString("module.image"), "module image URL (must be a valid docker image URL)")
 	viper.BindPFlag("module.image", draftDeployCmd.Flags().Lookup("image"))
 
 	// Infra configuration
-	draftDeployCmd.Flags().StringVar(&config.Infra.Hub, "hub", "", "IoT Hub name")
+	draftDeployCmd.Flags().StringVar(&config.Infra.Hub, "hub", "", "the name of the iot hub to send the deployment to")
 	viper.BindPFlag("infra.hub", draftDeployCmd.Flags().Lookup("hub"))
 
 	// Auth configuration
