@@ -38,7 +38,7 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", utils.GetEnv("EL_CONFIG", DEFAULT_CONFIG_FILE), "configuration file")
 
-	rootCmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "force the command to proceed")
+	rootCmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "force an action")
 }
 
 func loadConfig() (*configuration.Configuration, error) {

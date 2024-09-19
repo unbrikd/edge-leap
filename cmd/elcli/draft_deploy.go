@@ -45,7 +45,7 @@ func init() {
 	draftDeployCmd.Flags().StringVarP(&config.Module.Name, "module-name", "m", viper.GetString("module.name"), "desired module name to show in the iotedge list (must be camelCase)")
 	viper.BindPFlag("module.name", draftDeployCmd.Flags().Lookup("module-name"))
 
-	draftDeployCmd.Flags().StringVar(&config.Module.CreateOptions, "create-options", viper.GetString("module.create-options"), "module container settings when running the module (json string)")
+	draftDeployCmd.Flags().StringVar(&config.Module.CreateOptions, "create-options", viper.GetString("module.create-options"), "runtime settings for the container of the module (json string)")
 	viper.BindPFlag("module.create-options", draftDeployCmd.Flags().Lookup("create-options"))
 
 	draftDeployCmd.Flags().StringVarP(&config.Module.StartupOrder, "startup-order", "s", viper.GetString("module.startup-order"), "module startup order")
@@ -59,7 +59,7 @@ func init() {
 	viper.BindPFlag("infra.hub", draftDeployCmd.Flags().Lookup("hub"))
 
 	// Auth configuration
-	draftDeployCmd.Flags().StringVar(&config.Auth.Token, "token", "", "Token to authenticate the client")
+	draftDeployCmd.Flags().StringVar(&config.Auth.Token, "token", "", "token to authenticate the client")
 	viper.BindPFlag("auth.token", draftDeployCmd.Flags().Lookup("token"))
 }
 
