@@ -2,4 +2,4 @@ bin/
 testdata/
 .DS_Store
 .vscode/
-./edge-leap.yaml
+edge-leap.yaml
