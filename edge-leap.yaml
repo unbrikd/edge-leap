@@ -1,0 +1,19 @@
+auth:
+  token: "SharedAccessSignature sr=iot-bems-dev-euw-p01.azure-devices.net&sig=8oPWXyAl%2FngVWmKtmRqmbGEzlf%2F6C8vpxSl74Xyj6GI%3D&se=1741530678&skn=iothubowner"
+deployment:
+  id: "random-module"
+  priority: 10
+  target-condition: ""
+device:
+  name: "dacarvalho-hyperv-03"
+image:
+  repo: "etibacr.azurecr.io/randommodule:latest"
+  tag: latest
+infra:
+  hub: "iot-bems-dev-euw-p01"
+module:
+  create-options: '{"net":"host"}'
+  name: "randomModule"
+  startup-order: "50"
+session: adcfc2f5c2c3
+version: 1

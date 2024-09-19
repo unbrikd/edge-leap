@@ -20,7 +20,6 @@ func (az *AzureReleaser) ReleaseModule(c *azure.Configuration) error {
 	}
 
 	if currentConfig != nil {
-		fmt.Printf("Configuration %s already exists, deleting it\n", c.Id)
 		err = az.configurationAttemptDelete(c.Id)
 		if err != nil {
 			return err
@@ -67,7 +66,7 @@ func (az *AzureReleaser) configurationExists(id string) (*azure.Configuration, e
 	}
 
 	if err = res.Expect(http.StatusOK, http.StatusNotFound); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to check configuration: %v", res.Response.Header["Iothub-Errorcode"])
 	}
 
 	if res.Is(http.StatusNotFound) {
@@ -84,7 +83,7 @@ func (az *AzureReleaser) configurationAttemptCreate(c *azure.Configuration) erro
 	}
 
 	if err = res.Expect(http.StatusOK); err != nil {
-		return err
+		return fmt.Errorf("failed to create configuration: %v", res.Response.Header["Iothub-Errorcode"])
 	}
 
 	return nil

@@ -36,19 +36,11 @@ func init() {
 
 // preExecuteChecksDraftDeploy checks if the required flags are set before executing the draft deploy command
 func preExecuteChecksDraftDeploy() {
-	if config.Deployment.Id == "" {
-		fmt.Println("error: deployment ID is required, use --id flag or set it in the configuration file")
-		os.Exit(1)
-	}
-
-	if config.Device.Name == "" {
-		fmt.Println("error: device name is required, use --device-name flag or set it in the configuration file")
-		os.Exit(1)
-	}
-
-	if config.Module.Name == "" {
-		fmt.Println("error: module name is required, use --module-name flag or set it in the configuration file")
-		os.Exit(1)
+	for _, flag := range []string{"deployment.id", "device.name", "module.name"} {
+		if viper.GetString(flag) == "" {
+			fmt.Printf("error: %s is required\n", flag)
+			os.Exit(1)
+		}
 	}
 }
 
@@ -73,4 +65,6 @@ func executeDraftDeploy() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
+	fmt.Printf("%s-%s\n", config.Deployment.Id, config.Id)
 }
