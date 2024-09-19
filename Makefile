@@ -15,12 +15,12 @@ GO_EXTENSION := ""
 # Docker build parameters
 DOCKER_REPO := "ghcr.io/unbrikd/elcli"
 DOCKER_FILE := "./docker/Dockerfile"
-DOCKER_OPTS := --build-arg APPLICATION_VERSION=$(APPLICATION_VERSION) --build-arg APPLICATION_BUILDID=$(APPLICATION_BUILDID) --build-arg GO_PKG=$(GO_PKG) $(DOCKER_EXTRAOPTS)
+DOCKER_OPTS := --build-arg APPLICATION_VERSION=$(APPLICATION_VERSION) --build-arg APPLICATION_BUILDID=$(APPLICATION_BUILDID) --build-arg GO_PKG=$(GO_PKG) --build-arg GO_MAIN=$(GO_MAIN) $(DOCKER_EXTRAOPTS)
 DOCKER_EXTRAOPTS := ""
 DOCKER_CONTEXT := "."
 
 docker-buildx:
-	@echo "---> Building docker image for linux/amd64 and linux/arm64"
+	@echo "---> Building docker image ghcr.io/unbrikd/$(APPLICATION_NAME):$(APPLICATION_VERSION)"
 	@docker buildx build \
 	--push \
     $(DOCKER_OPTS) \
