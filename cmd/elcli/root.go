@@ -42,33 +42,17 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&force, "force", false, "force the command to proceed")
 }
 
-func initConfig() {
-	viper.SetConfigFile(cfgFile)
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("Error reading configuration: %v\n", err)
-		os.Exit(1)
-	}
-
-	if err := viper.Unmarshal(&config); err != nil {
-		fmt.Printf("Error loading configuration: %v\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Println("root init")
-	fmt.Println(config)
-}
-
-func LoadConfig() (*configuration.Configuration, error) {
+func loadConfig() (*configuration.Configuration, error) {
 	viper.SetConfigFile(cfgFile)
 	viper.SetConfigType("yaml")
 
 	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("Error reading configuration: %v\n", err)
+		fmt.Printf("error reading configuration: %v\n", err)
 		return nil, err
 	}
 
 	if err := viper.Unmarshal(&config); err != nil {
-		fmt.Printf("Error loading configuration: %v\n", err)
+		fmt.Printf("error loading configuration: %v\n", err)
 		return nil, err
 	}
 

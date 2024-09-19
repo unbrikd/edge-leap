@@ -16,7 +16,11 @@ var newDraftCmd = &cobra.Command{
 	Short: "Sets a new draft session for a module",
 	Run: func(cmd *cobra.Command, args []string) {
 		preExecuteChecksNewDraft()
-		LoadConfig()
+
+		if _, err := loadConfig(); err != nil {
+			fmt.Printf("error loading configuration: %v\n", err)
+			os.Exit(1)
+		}
 		executeNewDraft()
 	},
 }
@@ -31,22 +35,23 @@ func init() {
 func preExecuteChecksNewDraft() {
 	if _, err := os.Stat(cfgFile); err == nil {
 		if !force {
-			fmt.Printf("Configuration file already exists. Use --force to overwrite\n")
+			fmt.Printf("configuration file already exists, use --force to overwrite\n")
 			os.Exit(1)
 		}
 
 		if err := os.Remove(cfgFile); err != nil {
-			fmt.Printf("Error removing configuration file: %v\n", err)
+			fmt.Printf("error deleting existing configuration file: %v\n", err)
 			os.Exit(1)
 		}
 
 		if _, err := os.Create(cfgFile); err != nil {
-			fmt.Printf("Error creating configuration file: %v\n", err)
+			fmt.Printf("error creating new configuration file: %v\n", err)
 			os.Exit(1)
 		}
 	}
 }
 
+// executeNewDraft generates a new draft session by creating a new configuration file to be used to deploy the draft module
 func executeNewDraft() {
 	id := strings.Split(uuid.New().String(), "-")[4]
 	viper.Set("session", id)

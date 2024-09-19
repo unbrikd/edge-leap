@@ -16,6 +16,8 @@ type Configuration struct {
 		StartupOrder string `mapstructure:"startup-order,omitempty"`
 		// CreateOptions is the create options of the module in the cloud provider.
 		CreateOptions string `mapstructure:"create-options,omitempty"`
+		// Image is URL of the image to be used for the module.
+		Image string `mapstructure:"image,omitempty"`
 	} `mapstructure:"module"`
 
 	Deployment struct {
@@ -27,28 +29,16 @@ type Configuration struct {
 		TargetCondition string `mapstructure:"target-condition"`
 	} `mapstructure:"deployment"`
 
-	// Image struct holds the image information.
-	Image struct {
-		// Repo is the repository of the image to be pushed to the registry.
-		Repo string `mapstructure:"repo"`
-		// Tag is the tag of the image to be pushed to/from the registry.
-		Tag string `mapstructure:"tag"`
-	} `mapstructure:"image"`
-
 	// Device struct holds the development device information.
 	Device struct {
 		// Name is the name of the device in the cloud provider.
 		Name string `mapstructure:"name"`
-		// Arch is the architecture of the device.
-		Arch string `mapstructure:"arch"`
 	} `mapstructure:"device"`
 
 	// Infra struct holds the infrastructure information.
 	Infra struct {
 		// Hub is the name of the IoT Hub where the development device is connected.
 		Hub string `mapstructure:"hub"`
-		// Registry is the name of the container registry to push the images.
-		Registry string `mapstructure:"registry"`
 	} `mapstructure:"infra"`
 
 	Auth struct {

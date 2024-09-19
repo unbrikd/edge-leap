@@ -29,8 +29,8 @@ type Twin struct {
 	Tags     interface{} `json:"tags"`
 }
 
-// GetConfiguration retrieves a configuration from the Azure IoT Hub. A configuration object is returned if the
-// operation is successful, otherwise an error is returned and the configuration object is nil.
+// GetConfiguration retrieves a configuration from the Azure IoT Hub. A configuration object is returned if the operation is successful, otherwise an error is returned and the configuration object
+// is nil.
 func (s *ConfigurationsService) GetConfiguration(ctx context.Context, id string) (*Configuration, *Response, error) {
 	u := fmt.Sprintf("configurations/%s?api-version=2021-04-12", id)
 
@@ -48,6 +48,8 @@ func (s *ConfigurationsService) GetConfiguration(ctx context.Context, id string)
 	return c, &Response{res}, err
 }
 
+// CreateConfiguration creates a configuration in the Azure IoT Hub. A configuration object is returned if the operation is successful, otherwise an error is returned and the configuration object is
+// nil.
 func (s *ConfigurationsService) CreateConfiguration(ctx context.Context, c Configuration) (*Configuration, *Response, error) {
 	u := fmt.Sprintf("configurations/%s?api-version=2021-04-12", c.Id)
 
@@ -65,8 +67,7 @@ func (s *ConfigurationsService) CreateConfiguration(ctx context.Context, c Confi
 	return cNew, &Response{res}, nil
 }
 
-// DeleteConfiguration deletes a configuration from the Azure IoT Hub. An error is returned if the operation is not
-// successful.
+// DeleteConfiguration deletes a configuration from the Azure IoT Hub. An error is returned if the operation is not successful.
 func (s *ConfigurationsService) DeleteConfiguration(id string) (*Response, error) {
 	u := fmt.Sprintf("configurations/%s?api-version=2021-04-12", id)
 
@@ -83,6 +84,8 @@ func (s *ConfigurationsService) DeleteConfiguration(id string) (*Response, error
 	return &Response{res}, nil
 }
 
+// SetContent sets the content of the properties key in the a Configuration object. Since this key is dynamic (depends on the module name), we have to handle it in a special way.
+// The current supported properties to set are: module name, image URL, module create options and module startup order.
 func (c *Configuration) SetContent(mod, img, opts, so string) {
 	props := fmt.Sprintf("properties.desired.%s", mod)
 	contents := map[string]interface{}{
@@ -102,6 +105,7 @@ func (c *Configuration) SetContent(mod, img, opts, so string) {
 	c.Content = contents
 }
 
+// GetTwin retrieves the twin of a device from the Azure IoT Hub. A twin object is returned if the operation is successful, otherwise an error is returned and the twin object is nil.
 func (d *DevicesService) GetTwin(deviceId string) (*Twin, *Response, error) {
 	u := fmt.Sprintf("twins/%s?api-version=2021-04-12", deviceId)
 
@@ -119,6 +123,8 @@ func (d *DevicesService) GetTwin(deviceId string) (*Twin, *Response, error) {
 	return t, &Response{res}, nil
 }
 
+// UpdateTwinTags updates the tags of a device twin in the Azure IoT Hub. To change the tags, the structure provided must match the structure of the tags in the twin.
+// If the tag is missing in the structure, it will be created. If any tag is set to nil, it will be removed from the twin.
 func (d *DevicesService) UpdateTwinTags(deviceId string, tags map[string]interface{}) (*Twin, *Response, error) {
 	u := fmt.Sprintf("twins/%s?api-version=2021-04-12", deviceId)
 
