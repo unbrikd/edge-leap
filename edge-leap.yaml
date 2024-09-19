@@ -1,0 +1,17 @@
+auth:
+    token: ""
+deployment:
+    id: ""
+    priority: 50
+    target-condition: ""
+device:
+    name: ""
+infra:
+    hub: ""
+module:
+    create-options: ""
+    image: ""
+    name: ""
+    startup-order: ""
+session: 20226f7d6401
+version: 1

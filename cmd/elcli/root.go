@@ -1,4 +1,4 @@
-package cmd
+package elcli
 
 import (
 	"fmt"
@@ -25,7 +25,7 @@ unbrikd (c) 2024`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+// This is called by elcli.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
@@ -36,20 +36,24 @@ func Execute() {
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
-	rootCmd.PersistentFlags().StringVarP(
-		&cfgFile, "file", "f", utils.GetEnv("EL_CONFIG_FILE", DEFAULT_CONFIG_FILE), "configuration file")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", utils.GetEnv("EL_CONFIG", DEFAULT_CONFIG_FILE), "configuration file")
 
-	rootCmd.PersistentFlags().BoolVar(&force, "force", false, "force the command to proceed")
+	rootCmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "force an action")
 }
 
-func initConfig() {
+func loadConfig() (*configuration.Configuration, error) {
 	viper.SetConfigFile(cfgFile)
+	viper.SetConfigType("yaml")
 
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Printf("Using config file: %s\n", cfgFile)
-	} else {
-		fmt.Println("No config file found, using flags only")
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Printf("error reading configuration: %v\n", err)
+		return nil, err
 	}
 
-	viper.Unmarshal(&config)
+	if err := viper.Unmarshal(&config); err != nil {
+		fmt.Printf("error loading configuration: %v\n", err)
+		return nil, err
+	}
+
+	return &config, nil
 }

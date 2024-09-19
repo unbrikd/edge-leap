@@ -7,6 +7,7 @@ APPLICATION_ARCH := ""
 # Golang build parameters
 GO_OS := ""
 GO_ARCH := ""
+GO_MAIN := "./cmd/elcli.go"
 GO_PKG := "github.com/unbrikd/edge-leap"
 GO_BINDIR := "./bin"
 GO_EXTENSION := ""
@@ -42,7 +43,7 @@ build:
 	@echo "---> $(GO_BINDIR)/elcli-v$(APPLICATION_VERSION).${GO_OS}-${GO_ARCH}$(EXTENSION)"
 	@GOOS=$(GO_OS) GOARCH=$(GO_ARCH) go build \
 		-ldflags "-s -w -X $(GO_PKG)/version.Version=$(APPLICATION_VERSION) -X $(GO_PKG)/version.Revision=$(APPLICATION_BUILDID)" \
-		-o $(GO_BINDIR)/elcli-v$(APPLICATION_VERSION).${GO_OS}-${GO_ARCH}$(GO_EXTENSION)
+		-o $(GO_BINDIR)/elcli-v$(APPLICATION_VERSION).${GO_OS}-${GO_ARCH}$(GO_EXTENSION) $(GO_MAIN)
 
 build-macos:
 	@echo "---> Building for darwin/amd64"
@@ -68,3 +69,4 @@ print-version:
 clean:
 	@echo "---> Cleaning up"
 	@echo "$(GO_BINDIR)/*" && rm -rf $(GO_BINDIR)/*
+	@echo "./edge-leap.yaml" && rm -rf ./edge-leap.yaml
