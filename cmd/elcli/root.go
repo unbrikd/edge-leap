@@ -1,7 +1,6 @@
 package elcli
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -36,8 +35,7 @@ func Execute() {
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "configuration file")
-
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", DEFAULT_CONFIG_FILE, "configuration file")
 	rootCmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "force an action")
 }
 
@@ -46,11 +44,11 @@ func loadConfig() (*configuration.Configuration, error) {
 	viper.SetConfigType("yaml")
 
 	if err := viper.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("error reading configuration: %v", err)
+		return nil, err
 	}
 
 	if err := viper.Unmarshal(&config); err != nil {
-		return nil, fmt.Errorf("error unmarshalling configuration: %v", err)
+		return nil, err
 	}
 
 	return &config, nil

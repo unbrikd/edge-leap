@@ -15,7 +15,7 @@ func TestSetContext(t *testing.T) {
 	startupOrder := "so"
 	envVars := map[string]string{
 		"ENV_VAR_1": "KEY_VAR_1",
-		"ENV_VAR_2": "KEY_VAR_2",
+		"ENV_VAR_2": "",
 	}
 
 	c.SetContent(moduleName, image, createOpts, startupOrder, envVars)

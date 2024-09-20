@@ -16,11 +16,11 @@ var newDraftCmd = &cobra.Command{
 	Short: "Sets a new module draft configuration",
 	Run: func(cmd *cobra.Command, args []string) {
 		preExecuteChecksNewDraft()
-
 		if _, err := loadConfig(); err != nil {
 			fmt.Printf("error loading configuration: %v\n", err)
 			os.Exit(1)
 		}
+
 		executeNewDraft()
 	},
 }
@@ -43,11 +43,11 @@ func preExecuteChecksNewDraft() {
 			fmt.Printf("error deleting existing configuration file: %v\n", err)
 			os.Exit(1)
 		}
+	}
 
-		if _, err := os.Create(cfgFile); err != nil {
-			fmt.Printf("error creating new configuration file: %v\n", err)
-			os.Exit(1)
-		}
+	if _, err := os.Create(cfgFile); err != nil {
+		fmt.Printf("error creating new configuration file: %v\n", err)
+		os.Exit(1)
 	}
 }
 
