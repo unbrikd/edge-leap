@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/unbrikd/edge-leap/internal/configuration"
-	"github.com/unbrikd/edge-leap/internal/utils"
 )
 
 const DEFAULT_CONFIG_FILE = "./edge-leap.yaml"
@@ -15,6 +14,7 @@ const DEFAULT_CONFIG_FILE = "./edge-leap.yaml"
 var cfgFile string
 var force bool
 var config configuration.Configuration
+var envFlag []string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -36,7 +36,7 @@ func Execute() {
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", utils.GetEnv("EL_CONFIG", DEFAULT_CONFIG_FILE), "configuration file")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "configuration file")
 
 	rootCmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "force an action")
 }
@@ -46,13 +46,11 @@ func loadConfig() (*configuration.Configuration, error) {
 	viper.SetConfigType("yaml")
 
 	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("error reading configuration: %v\n", err)
-		return nil, err
+		return nil, fmt.Errorf("error reading configuration: %v", err)
 	}
 
 	if err := viper.Unmarshal(&config); err != nil {
-		fmt.Printf("error loading configuration: %v\n", err)
-		return nil, err
+		return nil, fmt.Errorf("error unmarshalling configuration: %v", err)
 	}
 
 	return &config, nil

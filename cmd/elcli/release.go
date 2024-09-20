@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/unbrikd/edge-leap/internal/azure"
 	"github.com/unbrikd/edge-leap/internal/releaser"
+	"github.com/unbrikd/edge-leap/internal/utils"
 )
 
 // releaseCmd represents the release command
@@ -16,9 +17,11 @@ var releaseCmd = &cobra.Command{
 	Use:   "release",
 	Short: "Handles the release of an application",
 	Run: func(cmd *cobra.Command, args []string) {
-		if _, err := loadConfig(); err != nil {
-			fmt.Printf("error loading configuration: %v\n", err)
-			os.Exit(1)
+		if cfgFile != "" {
+			if _, err := loadConfig(); err != nil {
+				fmt.Printf("error loading configuration: %v\n", err)
+				os.Exit(1)
+			}
 		}
 		executeRelease()
 	},
@@ -54,6 +57,9 @@ func init() {
 	releaseCmd.Flags().StringVarP(&config.Module.Image, "image", "i", viper.GetString("module.image"), "module image URL (must be a valid docker image URL)")
 	viper.BindPFlag("module.image", releaseCmd.Flags().Lookup("image"))
 
+	releaseCmd.Flags().StringArrayVarP(&envFlag, "env", "e", nil, "environment variables for the module (key=value)")
+	viper.BindPFlag("module.env", releaseCmd.Flags().Lookup("env"))
+
 	// Infra configuration
 	releaseCmd.Flags().StringVar(&config.Infra.Hub, "hub", "", "the name of the iot hub to send the deployment to")
 	viper.BindPFlag("infra.hub", releaseCmd.Flags().Lookup("hub"))
@@ -66,6 +72,12 @@ func init() {
 // executeRelease handles the release of a module taking the configuration file or the flags.
 // The flags have precedence over the configuration file.
 func executeRelease() {
+	moduleEnv, err := utils.StringArraySplitToMap(envFlag, "=")
+	if err != nil {
+		fmt.Printf("failed to parse environment variables: %v", err)
+		os.Exit(1)
+	}
+
 	c := azure.NewClient(nil).WithAuthToken(config.Auth.Token)
 	c.BaseURL, _ = url.Parse(fmt.Sprintf("https://%s.azure-devices.net/", config.Infra.Hub))
 
@@ -74,13 +86,15 @@ func executeRelease() {
 		Priority:        config.Deployment.Priority,
 		TargetCondition: config.Deployment.TargetCondition,
 	}
-	d.SetContent(config.Module.Name, config.Module.Image, config.Module.CreateOptions, config.Module.StartupOrder)
+	d.SetContent(config.Module.Name, config.Module.Image, config.Module.CreateOptions, config.Module.StartupOrder, moduleEnv)
+
+	fmt.Print(d)
 
 	r := releaser.AzureReleaser{Client: c}
-	err := r.ReleaseModule(&d)
+	err = r.ReleaseModule(&d)
 	if err != nil {
 		fmt.Printf("failed to release module: %v", err)
-		return
+		os.Exit(1)
 	}
 
 	fmt.Printf("%s\n", config.Deployment.Id)

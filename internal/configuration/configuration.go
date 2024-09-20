@@ -18,6 +18,8 @@ type Configuration struct {
 		CreateOptions string `mapstructure:"create-options,omitempty"`
 		// Image is URL of the image to be used for the module.
 		Image string `mapstructure:"image,omitempty"`
+		// Env is the environment variables to be set in the module at runtime.
+		Env map[string]string `mapstructure:"env,omitempty"`
 	} `mapstructure:"module"`
 
 	Deployment struct {

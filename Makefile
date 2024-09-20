@@ -63,6 +63,12 @@ build-windows:
 	@echo "---> Building for windows/amd64"
 	@$(MAKE) build GO_OS=windows GO_ARCH=amd64 GO_EXTENSION=".exe" GO_BINDIR=$(GO_BINDIR)
 
+
+unit-tests:
+	@echo "---> Running unit tests"
+	@go test -v ./...
+
+
 print-version:
 	@echo $(APPLICATION_VERSION)
 

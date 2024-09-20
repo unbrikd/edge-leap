@@ -86,8 +86,18 @@ func (s *ConfigurationsService) DeleteConfiguration(id string) (*Response, error
 
 // SetContent sets the content of the properties key in the a Configuration object. Since this key is dynamic (depends on the module name), we have to handle it in a special way.
 // The current supported properties to set are: module name, image URL, module create options and module startup order.
-func (c *Configuration) SetContent(mod, img, opts, so string) {
+func (c *Configuration) SetContent(mod, img, opts, so string, vars map[string]string) {
 	props := fmt.Sprintf("properties.desired.%s", mod)
+
+	env := map[string]interface{}{}
+	for k, v := range vars {
+		env[k] = struct {
+			Value string `json:"value"`
+		}{
+			Value: v,
+		}
+	}
+
 	contents := map[string]interface{}{
 		"modulesContent": map[string]interface{}{
 			"$edgeAgent": map[string]interface{}{
@@ -97,6 +107,7 @@ func (c *Configuration) SetContent(mod, img, opts, so string) {
 						"createOptions": opts,
 					},
 					"startupOrder": so,
+					"env":          env,
 				},
 			},
 		},
