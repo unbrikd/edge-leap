@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"strings"
 
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/unbrikd/edge-leap/internal/azure"
@@ -76,10 +78,13 @@ func executeRelease() {
 	c := azure.NewClient(nil).WithAuthToken(config.Auth.Token)
 	c.BaseURL, _ = url.Parse(fmt.Sprintf("https://%s.azure-devices.net/", config.Infra.Hub))
 
+	releaseId := strings.Split(uuid.New().String(), "-")[4]
 	d := azure.Configuration{
 		Id:              config.Deployment.Id,
 		Priority:        config.Deployment.Priority,
 		TargetCondition: config.Deployment.TargetCondition,
+		Labels: map[string]string{
+			"releaseId": releaseId},
 	}
 	d.SetContent(config.Module.Name, config.Module.Image, config.Module.CreateOptions, config.Module.StartupOrder, moduleEnv)
 
@@ -90,5 +95,5 @@ func executeRelease() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("%s\n", config.Deployment.Id)
+	fmt.Printf("%s, release %s\n", config.Deployment.Id, releaseId)
 }
