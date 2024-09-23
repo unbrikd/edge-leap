@@ -88,7 +88,7 @@ func executeDraftDeploy() {
 		Priority:        config.Deployment.Priority,
 		TargetCondition: fmt.Sprintf("tags.application.%s='%s'", config.Module.Name, config.Id),
 	}
-	d.SetContent(config.Module.Name, config.Module.Image, config.Module.CreateOptions, config.Module.StartupOrder)
+	d.SetContent(config.Module.Name, config.Module.Image, config.Module.CreateOptions, config.Module.StartupOrder, map[string]string{})
 
 	if err := r.ReleaseModule(&d); err != nil {
 		fmt.Println(err)
