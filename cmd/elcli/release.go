@@ -54,7 +54,7 @@ func init() {
 	releaseCmd.Flags().StringVarP(&config.Module.Image, "image", "i", viper.GetString("module.image"), "module image URL (must be a valid docker image URL)")
 	viper.BindPFlag("module.image", releaseCmd.Flags().Lookup("image"))
 
-	releaseCmd.Flags().StringArrayVarP(&config.Module.Env, "env", "e", nil, "environment variables for the module (key=value)")
+	releaseCmd.Flags().StringSliceVarP(&config.Module.Env, "env", "e", nil, "environment variables for the module (key=value)")
 	viper.BindPFlag("module.env", releaseCmd.Flags().Lookup("env"))
 
 	// Infra configuration
