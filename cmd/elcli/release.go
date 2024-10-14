@@ -12,13 +12,17 @@ import (
 	"github.com/unbrikd/edge-leap/internal/azure"
 	"github.com/unbrikd/edge-leap/internal/releaser"
 	"github.com/unbrikd/edge-leap/internal/utils"
+	"go.uber.org/zap"
 )
+
+var logger *zap.SugaredLogger
 
 // releaseCmd represents the release command
 var releaseCmd = &cobra.Command{
 	Use:   "release",
 	Short: "Handles the release of an application",
 	Run: func(cmd *cobra.Command, args []string) {
+		logger = cmd.Context().Value("logger").(*zap.SugaredLogger)
 		loadConfig()
 		executeRelease()
 	},
@@ -69,12 +73,17 @@ func init() {
 // executeRelease handles the release of a module taking the configuration file or the flags.
 // The flags have precedence over the configuration file.
 func executeRelease() {
+	logger.Infof("releasing module '%s'", config.Module.Name)
+
+	logger.Debug("splitting environment variables")
 	moduleEnv, err := utils.StringArraySplitToMap(config.Module.Env, "=")
 	if err != nil {
 		fmt.Printf("failed to parse environment variables: %v", err)
 		os.Exit(1)
 	}
+	logger.Debugf("environment variables parsed: %v", moduleEnv)
 
+	logger.Debugf("creating azure client with token '%s'", config.Auth.Token)
 	c := azure.NewClient(nil).WithAuthToken(config.Auth.Token)
 	c.BaseURL, _ = url.Parse(fmt.Sprintf("https://%s.azure-devices.net/", config.Infra.Hub))
 
@@ -87,8 +96,9 @@ func executeRelease() {
 			"releaseId": releaseId},
 	}
 	d.SetContent(config.Module.Name, config.Module.Image, config.Module.CreateOptions, config.Module.StartupOrder, moduleEnv)
+	logger.Debugf("deployment content: %v", d.Content)
 
-	r := releaser.AzureReleaser{Client: c}
+	r := releaser.Azure(c, logger)
 	err = r.ReleaseModule(&d)
 	if err != nil {
 		fmt.Printf("failed to release module: %v", err)

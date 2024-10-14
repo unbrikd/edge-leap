@@ -3,6 +3,7 @@ package azure
 import (
 	"context"
 	"fmt"
+	"net/http/httputil"
 )
 
 type ConfigurationsService service
@@ -58,6 +59,11 @@ func (s *ConfigurationsService) CreateConfiguration(ctx context.Context, c Confi
 		return nil, nil, err
 	}
 
+	fmt.Println("ASDKJASHDKASJHDKJASHKJDASKJH")
+	// dump request in curl format for debugging
+	dump, _ := httputil.DumpRequestOut(req, true)
+	fmt.Println(string(dump))
+
 	cNew := new(Configuration)
 	res, err := s.client.Do(req, cNew)
 	if err != nil {
@@ -87,7 +93,7 @@ func (s *ConfigurationsService) DeleteConfiguration(id string) (*Response, error
 // SetContent sets the content of the properties key in the a Configuration object. Since this key is dynamic (depends on the module name), we have to handle it in a special way.
 // The current supported properties to set are: module name, image URL, module create options and module startup order.
 func (c *Configuration) SetContent(mod, img, opts, so string, vars map[string]string) {
-	props := fmt.Sprintf("properties.desired.%s", mod)
+	props := fmt.Sprintf("properties.desired.modules.%s", mod)
 
 	env := map[string]interface{}{}
 	for k, v := range vars {
@@ -106,8 +112,12 @@ func (c *Configuration) SetContent(mod, img, opts, so string, vars map[string]st
 						"image":         img,
 						"createOptions": opts,
 					},
-					"startupOrder": so,
-					"env":          env,
+					"startupOrder":  so,
+					"env":           env,
+					"type":          "docker",
+					"status":        "running",
+					"restartPolicy": "always",
+					"version":       "1.0",
 				},
 			},
 		},

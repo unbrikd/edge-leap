@@ -7,7 +7,7 @@ import (
 	"github.com/unbrikd/edge-leap/internal/azure"
 )
 
-func TestSetContext(t *testing.T) {
+func TestSetContent(t *testing.T) {
 	c := azure.Configuration{}
 	moduleName := "myModule"
 	image := "img"
@@ -24,7 +24,7 @@ func TestSetContext(t *testing.T) {
 	modulesContent := c.Content["modulesContent"]
 	edgeAgent := modulesContent.(map[string]interface{})["$edgeAgent"]
 
-	expectedModulePropertiesKey := fmt.Sprintf("properties.desired.%s", moduleName)
+	expectedModulePropertiesKey := fmt.Sprintf("properties.desired.modules.%s", moduleName)
 	if _, ok := edgeAgent.(map[string]interface{})[expectedModulePropertiesKey]; !ok {
 		t.Fatalf("configuration contents is missing '%s' key", expectedModulePropertiesKey)
 		return
@@ -66,4 +66,29 @@ func TestSetContext(t *testing.T) {
 		}
 	}
 
+	if _, ok := moduleProperties.(map[string]interface{})["type"]; !ok {
+		t.Fatal("configuration module properties is missing 'type' key")
+	}
+
+	modType := moduleProperties.(map[string]interface{})["type"]
+	if modType != "docker" {
+		t.Fatalf("expected 'docker' got '%s'", modType)
+	}
+
+	if _, ok := moduleProperties.(map[string]interface{})["status"]; !ok {
+		t.Fatal("configuration module properties is missing 'status' key")
+	}
+
+	modStatus := moduleProperties.(map[string]interface{})["status"]
+	if modStatus != "running" {
+		t.Fatalf("expected 'running' got '%s'", modStatus)
+	}
+
+	if _, ok := moduleProperties.(map[string]interface{})["restartPolicy"]; !ok {
+		t.Fatal("configuration module properties is missing 'restartPolicy' key")
+	}
+
+	if _, ok := moduleProperties.(map[string]interface{})["version"]; !ok {
+		t.Fatal("configuration module properties is missing 'version' key")
+	}
 }

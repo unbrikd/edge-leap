@@ -6,12 +6,26 @@ import (
 	"net/http"
 
 	"github.com/unbrikd/edge-leap/internal/azure"
+	"go.uber.org/zap"
 )
 
 // AzureReleaser is the handler for releasing configurations to Azure IoT Hub and deploy modules to devices
 type AzureReleaser struct {
 	// Azure client
 	Client *azure.Client
+	// Logger
+	logger *zap.SugaredLogger
+}
+
+func Azure(c *azure.Client, logger *zap.SugaredLogger) *AzureReleaser {
+	if logger == nil {
+		logger = zap.NewNop().Sugar()
+	}
+
+	return &AzureReleaser{
+		Client: c,
+		logger: logger,
+	}
 }
 
 // ReleaseModule releases a new configuration to Azure IoT Hub. Devices configurations are left untouched.
@@ -22,6 +36,7 @@ func (az *AzureReleaser) ReleaseModule(c *azure.Configuration) error {
 	if err != nil {
 		return err
 	}
+	az.logger.Debugf("current configuration is %v", currentConfig)
 
 	if currentConfig != nil {
 		err = az.configurationAttemptDelete(c.Id)
@@ -30,12 +45,15 @@ func (az *AzureReleaser) ReleaseModule(c *azure.Configuration) error {
 		}
 	}
 
+	az.logger.Debugf("creating configuration %v", c)
 	err = az.configurationAttemptCreate(c)
 	if err != nil {
 		if currentConfig != nil {
+			az.logger.Debug("failed to create configuration, restoring previous configuration")
 			az.configurationAttemptCreate(currentConfig)
 		}
 
+		az.logger.Debug("failed to create configuration")
 		return err
 	}
 
