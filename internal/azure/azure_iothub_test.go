@@ -7,7 +7,7 @@ import (
 	"github.com/unbrikd/edge-leap/internal/azure"
 )
 
-func TestSetContext(t *testing.T) {
+func TestSetContent(t *testing.T) {
 	c := azure.Configuration{}
 	moduleName := "myModule"
 	image := "img"
@@ -24,7 +24,7 @@ func TestSetContext(t *testing.T) {
 	modulesContent := c.Content["modulesContent"]
 	edgeAgent := modulesContent.(map[string]interface{})["$edgeAgent"]
 
-	expectedModulePropertiesKey := fmt.Sprintf("properties.desired.%s", moduleName)
+	expectedModulePropertiesKey := fmt.Sprintf("properties.desired.modules.%s", moduleName)
 	if _, ok := edgeAgent.(map[string]interface{})[expectedModulePropertiesKey]; !ok {
 		t.Fatalf("configuration contents is missing '%s' key", expectedModulePropertiesKey)
 		return
