@@ -1,0 +1,16 @@
+name: release
+
+on:
+  workflow_call:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Unit Tests
+        run: |
+          make unit-tests
