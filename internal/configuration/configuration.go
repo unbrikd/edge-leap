@@ -13,7 +13,7 @@ type Configuration struct {
 		// Name is the name of the module in the edge workload controller runtime.
 		Name string `mapstructure:"name,omitempty"`
 		// StartupOrder is the startup order of the module in the cloud provider.
-		StartupOrder string `mapstructure:"startup-order,omitempty"`
+		StartupOrder int `mapstructure:"startup-order,omitempty"`
 		// CreateOptions is the create options of the module in the cloud provider.
 		CreateOptions string `mapstructure:"create-options,omitempty"`
 		// Image is URL of the image to be used for the module.

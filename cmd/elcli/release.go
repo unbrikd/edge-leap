@@ -52,7 +52,7 @@ func init() {
 	releaseCmd.Flags().StringVar(&config.Module.CreateOptions, "create-options", viper.GetString("module.create-options"), "runtime settings for the container of the module (json string)")
 	viper.BindPFlag("module.create-options", releaseCmd.Flags().Lookup("create-options"))
 
-	releaseCmd.Flags().StringVarP(&config.Module.StartupOrder, "startup-order", "s", viper.GetString("module.startup-order"), "module startup order")
+	releaseCmd.Flags().IntVarP(&config.Module.StartupOrder, "startup-order", "s", viper.GetInt("module.startup-order"), "module startup order")
 	viper.BindPFlag("module.startup-order", releaseCmd.Flags().Lookup("startup-order"))
 
 	releaseCmd.Flags().StringVarP(&config.Module.Image, "image", "i", viper.GetString("module.image"), "module image URL (must be a valid docker image URL)")
