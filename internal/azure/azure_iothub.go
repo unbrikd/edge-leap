@@ -3,7 +3,6 @@ package azure
 import (
 	"context"
 	"fmt"
-	"net/http/httputil"
 )
 
 type ConfigurationsService service
@@ -58,11 +57,6 @@ func (s *ConfigurationsService) CreateConfiguration(ctx context.Context, c Confi
 	if err != nil {
 		return nil, nil, err
 	}
-
-	fmt.Println("----- REQUEST DUMP ------")
-	// dump request in curl format for debugging
-	dump, _ := httputil.DumpRequestOut(req, true)
-	fmt.Println(string(dump))
 
 	cNew := new(Configuration)
 	res, err := s.client.Do(req, cNew)
