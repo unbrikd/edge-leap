@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/unbrikd/edge-leap/internal/azure"
 	"github.com/unbrikd/edge-leap/internal/releaser"
+	"github.com/unbrikd/edge-leap/internal/utils"
 )
 
 var draftDeployCmd = &cobra.Command{
@@ -54,6 +55,9 @@ func init() {
 	draftDeployCmd.Flags().StringVarP(&config.Module.Image, "image", "i", viper.GetString("module.image"), "module image URL (must be a valid docker image URL)")
 	viper.BindPFlag("module.image", draftDeployCmd.Flags().Lookup("image"))
 
+	draftDeployCmd.Flags().StringSliceVarP(&config.Module.Env, "env", "e", nil, "environment variables for the module (key=value)")
+	viper.BindPFlag("module.env", draftDeployCmd.Flags().Lookup("env"))
+
 	// Infra configuration
 	draftDeployCmd.Flags().StringVar(&config.Infra.Hub, "hub", "", "the name of the iot hub to send the deployment to")
 	viper.BindPFlag("infra.hub", draftDeployCmd.Flags().Lookup("hub"))
@@ -77,6 +81,12 @@ func executeDraftDeploy() {
 	c := azure.NewClient(nil).WithAuthToken(config.Auth.Token)
 	c.BaseURL, _ = url.Parse(fmt.Sprintf("https://%s.azure-devices.net/", config.Infra.Hub))
 
+	moduleEnv, err := utils.StringArraySplitToMap(config.Module.Env, "=")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	r := releaser.AzureReleaser{Client: c}
 	if err := r.SetModuleOnDevice(config.Device.Name, config.Module.Name, config.Id); err != nil {
 		fmt.Println(err)
@@ -88,7 +98,7 @@ func executeDraftDeploy() {
 		Priority:        config.Deployment.Priority,
 		TargetCondition: fmt.Sprintf("tags.application.%s='%s'", config.Module.Name, config.Id),
 	}
-	d.SetContent(config.Module.Name, config.Module.Image, config.Module.CreateOptions, config.Module.StartupOrder, map[string]string{})
+	d.SetContent(config.Module.Name, config.Module.Image, config.Module.CreateOptions, config.Module.StartupOrder, moduleEnv)
 
 	if err := r.ReleaseModule(&d); err != nil {
 		fmt.Println(err)

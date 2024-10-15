@@ -59,7 +59,7 @@ func (s *ConfigurationsService) CreateConfiguration(ctx context.Context, c Confi
 		return nil, nil, err
 	}
 
-	fmt.Println("ASDKJASHDKASJHDKJASHKJDASKJH")
+	fmt.Println("----- REQUEST DUMP ------")
 	// dump request in curl format for debugging
 	dump, _ := httputil.DumpRequestOut(req, true)
 	fmt.Println(string(dump))

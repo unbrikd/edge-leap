@@ -1,6 +1,6 @@
 # Build metadata
 APPLICATION_NAME := "elcli"
-APPLICATION_VERSION := "0.2.2"
+APPLICATION_VERSION := "0.2.3"
 APPLICATION_BUILDID=$(shell git rev-parse --short HEAD)
 APPLICATION_ARCH := ""
 
