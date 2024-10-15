@@ -12,7 +12,7 @@ func TestSetContent(t *testing.T) {
 	moduleName := "myModule"
 	image := "img"
 	createOpts := "opts"
-	startupOrder := "so"
+	startupOrder := 10
 	envVars := map[string]string{
 		"ENV_VAR_1": "KEY_VAR_1",
 		"ENV_VAR_2": "",
