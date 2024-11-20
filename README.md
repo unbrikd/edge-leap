@@ -6,7 +6,7 @@ EdgeLeap is a development tool that streamlines IoT Edge module deployment. It i
 
 ### Compiling from source
 
-The `edge-leap` client can be compiled from source using the provided `Makefile` rulesm and the output binary will be placed in the `bin` directory:
+The `edge-leap` client can be compiled from source using the provided `Makefile` rules and the output binary will be placed in the `bin` directory:
 
 ```shell
 # compile for the current platform
@@ -28,3 +28,30 @@ If you prefer to use Docker, the `edge-leap` docker image can be pulled from the
 ```shell
 docker run ghcr.io/unbrikd/elcli:latest <COMMAND>
 ```
+
+## Usage
+
+The `edge-leap` client is a CLI tool that can be used to manage the development stages of an IoT Edge module. The tool is designed to operate in two modes: `draft` and `release`.
+Each mode has its own set of subcommands and flags, that can be found by using the `--help` flag for each subcommand.
+
+### Draft mode
+
+The `draft` mode is used to manage development sessions. It allows developers to provide a configuration of the development environment and automatically handle the required operations, in order to build and deploy the module to the target device.
+
+First you need to initialize a new development session: `elcli draft new`. This will place the `edge-leap.yaml` configuration file in the current directory. The configuration file schema details can be found [here](./docs/configuration-schema-v1.md). If no flags are provided the configuration file information will be used, otherwise the flags will override the configuration file values.
+
+Once the configuration file is set, you can start the development session and as soon as you have the need to deploy the module to the target device, you can run `elcli draft deploy`. This will deploy the module to the target device, by:
+- pushing the module manifest to the IoT Hub
+- defining a unique deployment ID and using it as target condition
+- updating the device's device twin with to match the target condition
+
+### Release mode
+
+The `release` mode can be used to orchestrate the module release under the CI/CD pipeline. It allows developers to provide a configuration of the release environment and automatically handle the required operations, in order to deploy the module manifest to the target IoT Hub.
+
+A GitHub action is provided to automate the release process. The action can be found [here](https://github.com/unbrikd/actions/tree/master/elcli). The action requires the `AZURE_TOKEN` to be set as an environment variable for the workflow.
+
+
+## Contributing
+
+In order to contribute to the project, please read the [CONTRIBUTING.md](./CONTRIBUTING.md) file.
