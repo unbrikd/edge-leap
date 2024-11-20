@@ -2,7 +2,7 @@
 
 EdgeLeap is a development tool that streamlines IoT Edge module deployment. It integrates seamlessly with Azure IoT Edge and Azure IoT Hub to enable rapid local development and testing directly on edge devices, bypassing the traditional CI/CD pipeline. This allows developers to iterate quickly and validate their IoT Edge solutions in real device environments without the overhead of production deployment processes.
 
-## Installing Edge Leap client
+## Installation
 
 ### Compiling from source
 
@@ -36,11 +36,10 @@ Each mode has its own set of subcommands and flags, that can be found by using t
 
 ### Draft mode
 
-The `draft` mode is used to manage development sessions. It allows developers to provide a configuration of the development environment and automatically handle the required operations, in order to build and deploy the module to the target device.
+The `draft` mode is used to manage development sessions. It allows developers to provide a configuration of the development environment and automatically handle the required operations, in order to and deploy the module to the target device.
 
 The`elcli draft new` will initialize a new development session by creating a configuration file. This command will place the `edge-leap.yaml` configuration file in the current directory, which is expected to be filled with the required information for the development session.
 
-> _The configuration file schema details can be found [here](./docs/configuration-schema-v1.md)._
 
 To deploy the current draft, you can use the `elcli draft deploy` command. If no flags are provided the configuration file information will be used, otherwise the flags will override the configuration file values.
 
@@ -48,6 +47,8 @@ Deploying the module to the target device involves the following steps:
 - pushing the module manifest to the IoT Hub as layered deployment
 - defining a unique deployment ID and using it as target condition
 - updating the device's device twin with to match the target condition
+
+> _The configuration file schema details can be found [here](./docs/configuration-schema-v1.md)._
 
 ### Release mode
 
