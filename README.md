@@ -4,30 +4,24 @@ EdgeLeap is a development tool that streamlines IoT Edge module deployment. It i
 
 ## Installing Edge Leap client
 
-The `edge-leap` client can be installed in a few different ways:
+### Compiling from source
 
-1. **Compiling from source**
+The `edge-leap` client can be compiled from source using the provided `Makefile` rulesm and the output binary will be placed in the `bin` directory:
 
-The `edge-leap` client can be compiled from source using the provided `Makefile`. By default, compiled binaries are placed in the `bin` directory, but this can be overridden by setting the `GO_BINDIR` environment variable for the `make` command.
+```shell
+# compile for the current platform
+make build
 
-- To compile the client for the host platform and architecture, run:
-
-    ```shell
-    make build
-    ```
-
-- To compile for all architectures for a given platform, run:
-
-    ```shell
-    make build-[platform] # where [platform] is one of [macos | linux | windows]
-    ```
+# compile for a specific platform: macos, linux or windows
+make build-<platform>
+```
 
 
-2. **Using the pre-compiled binaries**
+### Using the pre-compiled binaries
 
 Another option to install the `edge-leap` client is to use the pre-compiled binaries available in the [releases page](https://github.com/unbrikd/edge-leap/releases). For each release, the client is compiled for: macOS, Linux, and Windows.
 
-3. **Using the Docker image**
+### Using the Docker image
 
 If you prefer to use Docker, the `edge-leap` docker image can be pulled from the container registry:
 
