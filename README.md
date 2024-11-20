@@ -38,20 +38,16 @@ Each mode has its own set of subcommands and flags, that can be found by using t
 
 The `draft` mode is used to manage development sessions. It allows developers to provide a configuration of the development environment and automatically handle the required operations, in order to build and deploy the module to the target device.
 
-- `elcli draft new`: Initialize a new development session by creating a configuration file in the current directory.
+The`elcli draft new` will initialize a new development session by creating a configuration file. This command will place the `edge-leap.yaml` configuration file in the current directory, which is expected to be filled with the required information for the development session.
 
-  First you need to initialize a new development session: `elcli draft new`. This will place the `edge-leap.yaml` configuration file in the current directory, which is expected to be filled with the required information for the development session.
+> _The configuration file schema details can be found [here](./docs/configuration-schema-v1.md)._
 
-  > _The configuration file schema details can be found [here](./docs/configuration-schema-v1.md)._
+To deploy the current draft, you can use the `elcli draft deploy` command. If no flags are provided the configuration file information will be used, otherwise the flags will override the configuration file values.
 
-- `elcli draft deploy`: Deploy the module to the target device.
-
-  Once the configuration file is set, you can start the development session and as soon as you want to deploy the module to the target device, you can run `elcli draft deploy`. If no flags are provided the configuration file information will be used, otherwise the flags will override the configuration file values.
-
-  Deploying the module to the target device involves the following steps:
-  - pushing the module manifest to the IoT Hub as layered deployment
-  - defining a unique deployment ID and using it as target condition
-  - updating the device's device twin with to match the target condition
+Deploying the module to the target device involves the following steps:
+- pushing the module manifest to the IoT Hub as layered deployment
+- defining a unique deployment ID and using it as target condition
+- updating the device's device twin with to match the target condition
 
 ### Release mode
 
