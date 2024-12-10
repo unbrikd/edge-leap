@@ -1,6 +1,7 @@
 package elcli
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -35,21 +36,38 @@ func Execute() {
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
+	rootCmd.AddCommand(draftCmd)
+	rootCmd.AddCommand(releaseCmd)
+
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", DEFAULT_CONFIG_FILE, "configuration file")
 	rootCmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "force an action")
 }
 
-func loadConfig() (*configuration.Configuration, error) {
+func loadConfig() {
 	viper.SetConfigFile(cfgFile)
 	viper.SetConfigType("yaml")
 
 	if err := viper.ReadInConfig(); err != nil {
-		return nil, err
+		fmt.Printf("error reading configuration: %v\n", err)
+		os.Exit(1)
 	}
 
 	if err := viper.Unmarshal(&config); err != nil {
-		return nil, err
+		fmt.Printf("error unmarshalling configuration: %v\n", err)
+	}
+}
+
+func checkRequired(flag ...string) {
+	notSet := []string{}
+
+	for _, f := range flag {
+		if viper.GetString(f) == "" {
+			notSet = append(notSet, f)
+		}
 	}
 
-	return &config, nil
+	if len(notSet) > 0 {
+		fmt.Printf("error: required value(s) for '%s' not set\n", notSet)
+		os.Exit(1)
+	}
 }

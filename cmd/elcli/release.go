@@ -18,52 +18,43 @@ import (
 var releaseCmd = &cobra.Command{
 	Use:   "release",
 	Short: "Handles the release of an application",
-	Run: func(cmd *cobra.Command, args []string) {
+	PreRun: func(cmd *cobra.Command, args []string) {
+		viper.BindPFlag("deployment.id", cmd.Flags().Lookup("id"))
+		viper.BindPFlag("deployment.priority", cmd.Flags().Lookup("priority"))
+		viper.BindPFlag("deployment.target-condition", cmd.Flags().Lookup("target-condition"))
+		viper.BindPFlag("device.name", cmd.Flags().Lookup("device-name"))
+		viper.BindPFlag("module.name", cmd.Flags().Lookup("module-name"))
+		viper.BindPFlag("module.create-options", cmd.Flags().Lookup("create-options"))
+		viper.BindPFlag("module.image", cmd.Flags().Lookup("image"))
+		viper.BindPFlag("module.startup-order", cmd.Flags().Lookup("startup-order"))
+		viper.BindPFlag("module.env", cmd.Flags().Lookup("env"))
+		viper.BindPFlag("infra.hub", cmd.Flags().Lookup("hub"))
+		viper.BindPFlag("auth.token", cmd.Flags().Lookup("token"))
+
 		loadConfig()
+	},
+	Run: func(cmd *cobra.Command, args []string) {
 		executeRelease()
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(releaseCmd)
-
 	// Deployment configuration
-	releaseCmd.Flags().StringVar(&config.Deployment.Id, "id", viper.GetString("deployment.id"), "id to use for deployment (must be kebab-case)")
-	viper.BindPFlag("deployment.id", releaseCmd.Flags().Lookup("id"))
-
+	releaseCmd.Flags().StringVar(&config.Deployment.Id, "id", "", "id to use for deployment (must be kebab-case)")
 	releaseCmd.Flags().Int16VarP(&config.Deployment.Priority, "priority", "p", 50, "module deployment priority")
-	viper.BindPFlag("deployment.priority", releaseCmd.Flags().Lookup("priority"))
-
-	releaseCmd.Flags().StringVarP(&config.Deployment.TargetCondition, "target-condition", "t", viper.GetString("deployment.target-condition"), "target condition for the deployment")
-	viper.BindPFlag("deployment.target-condition", releaseCmd.Flags().Lookup("target-condition"))
-
+	releaseCmd.Flags().StringVarP(&config.Deployment.TargetCondition, "target-condition", "t", "", "target condition for the deployment")
 	// Device configuration
-	releaseCmd.Flags().StringVar(&config.Device.Name, "device-name", viper.GetString("device.name"), "device name to deploy the module to")
-	viper.BindPFlag("device.name", releaseCmd.Flags().Lookup("device-name"))
-
+	releaseCmd.Flags().StringVar(&config.Device.Name, "device-name", "", "device name to deploy the module to")
 	// Module configuration
-	releaseCmd.Flags().StringVarP(&config.Module.Name, "module-name", "m", viper.GetString("module.name"), "desired module name to show in the iotedge list (must be camelCase)")
-	viper.BindPFlag("module.name", releaseCmd.Flags().Lookup("module-name"))
-
-	releaseCmd.Flags().StringVar(&config.Module.CreateOptions, "create-options", viper.GetString("module.create-options"), "runtime settings for the container of the module (json string)")
-	viper.BindPFlag("module.create-options", releaseCmd.Flags().Lookup("create-options"))
-
-	releaseCmd.Flags().IntVarP(&config.Module.StartupOrder, "startup-order", "s", viper.GetInt("module.startup-order"), "module startup order")
-	viper.BindPFlag("module.startup-order", releaseCmd.Flags().Lookup("startup-order"))
-
-	releaseCmd.Flags().StringVarP(&config.Module.Image, "image", "i", viper.GetString("module.image"), "module image URL (must be a valid docker image URL)")
-	viper.BindPFlag("module.image", releaseCmd.Flags().Lookup("image"))
-
+	releaseCmd.Flags().StringVarP(&config.Module.Name, "module-name", "m", "", "desired module name to show in the iotedge list (must be camelCase)")
+	releaseCmd.Flags().StringVar(&config.Module.CreateOptions, "create-options", "", "runtime settings for the container of the module (json string)")
+	releaseCmd.Flags().IntVarP(&config.Module.StartupOrder, "startup-order", "s", 20, "module startup order")
+	releaseCmd.Flags().StringVarP(&config.Module.Image, "image", "i", "", "module image URL (must be a valid docker image URL)")
 	releaseCmd.Flags().StringSliceVarP(&config.Module.Env, "env", "e", nil, "environment variables for the module (key=value)")
-	viper.BindPFlag("module.env", releaseCmd.Flags().Lookup("env"))
-
 	// Infra configuration
 	releaseCmd.Flags().StringVar(&config.Infra.Hub, "hub", "", "the name of the iot hub to send the deployment to")
-	viper.BindPFlag("infra.hub", releaseCmd.Flags().Lookup("hub"))
-
 	// Auth configuration
 	releaseCmd.Flags().StringVar(&config.Auth.Token, "token", "", "token to authenticate the client")
-	viper.BindPFlag("auth.token", releaseCmd.Flags().Lookup("token"))
 }
 
 // executeRelease handles the release of a module taking the configuration file or the flags.

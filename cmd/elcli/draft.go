@@ -13,7 +13,8 @@ var draftCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(draftCmd)
+	draftCmd.AddCommand(draftDeployCmd)
+	draftCmd.AddCommand(draftNewCmd)
 }
 
 func executeDraft() {
