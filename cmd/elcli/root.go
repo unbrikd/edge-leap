@@ -14,7 +14,6 @@ const DEFAULT_CONFIG_FILE = "./edge-leap.yaml"
 var cfgFile string
 var force bool
 var config configuration.Configuration
-var envFlag []string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -35,9 +34,6 @@ func Execute() {
 
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
-
-	rootCmd.AddCommand(draftCmd)
-	rootCmd.AddCommand(releaseCmd)
 
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", DEFAULT_CONFIG_FILE, "configuration file")
 	rootCmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "force an action")

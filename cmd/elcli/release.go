@@ -39,6 +39,8 @@ var releaseCmd = &cobra.Command{
 }
 
 func init() {
+	rootCmd.AddCommand(releaseCmd)
+
 	// Deployment configuration
 	releaseCmd.Flags().StringVar(&config.Deployment.Id, "id", "", "id to use for deployment (must be kebab-case)")
 	releaseCmd.Flags().Int16VarP(&config.Deployment.Priority, "priority", "p", 50, "module deployment priority")
