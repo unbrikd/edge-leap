@@ -18,7 +18,8 @@ var draftNewCmd = &cobra.Command{
 		handleConfigFileCreation()
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		executeDraftNew()
+		id := strings.Split(uuid.New().String(), "-")[4]
+		newDraft(id)
 	},
 }
 
@@ -36,6 +37,8 @@ func handleConfigFileCreation() {
 			fmt.Printf("error deleting existing configuration file: %v\n", err)
 			os.Exit(1)
 		}
+
+		viper.Reset()
 	}
 
 	if _, err := os.Create(cfgFile); err != nil {
@@ -44,12 +47,7 @@ func handleConfigFileCreation() {
 	}
 }
 
-// executeNewDraft generates a new draft session by creating a new configuration file to be used to deploy the draft module
-func executeDraftNew() {
-	fmt.Println("image name: ", config.Module.Image)
-
-	id := strings.Split(uuid.New().String(), "-")[4]
-
+func newDraft(id string) {
 	viper.SetConfigFile(cfgFile)
 	viper.SetConfigType("yaml")
 	viper.Set("session", id)

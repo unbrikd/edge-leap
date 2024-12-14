@@ -1,6 +1,6 @@
 package configuration
 
-const CONFIG_VERSION = 1
+const CONFIG_VERSION = "1"
 
 type Configuration struct {
 	// Id is the unique identifier of the session.
