@@ -71,14 +71,8 @@ func TestNewDraft(t *testing.T) {
 
 // Setup function to create necessary directories before tests
 func TestMain(m *testing.M) {
-	// Create testdata directory if it doesn't exist
 	os.MkdirAll("testdata", 0755)
-
-	// Run tests
 	exitCode := m.Run()
-
-	// Optional: Clean up testdata directory after tests
 	os.RemoveAll("testdata")
-
 	os.Exit(exitCode)
 }
