@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/unbrikd/edge-leap/internal/azure"
 )
 
@@ -20,75 +21,38 @@ func TestSetContent(t *testing.T) {
 
 	c.SetContent(moduleName, image, createOpts, startupOrder, envVars)
 
-	// .(map[string]interface{})["$edgeAgent"].(map[string]interface{})["properties.desired.mod"].(map[string]interface{})
 	modulesContent := c.Content["modulesContent"]
-	edgeAgent := modulesContent.(map[string]interface{})["$edgeAgent"]
+	if _, ok := modulesContent.(map[string]interface{})["$edgeAgent"]; !ok {
+		t.Fatal("configuration contents is missing '$edgeAgent' key")
+	}
 
 	expectedModulePropertiesKey := fmt.Sprintf("properties.desired.modules.%s", moduleName)
+	edgeAgent := modulesContent.(map[string]interface{})["$edgeAgent"]
 	if _, ok := edgeAgent.(map[string]interface{})[expectedModulePropertiesKey]; !ok {
 		t.Fatalf("configuration contents is missing '%s' key", expectedModulePropertiesKey)
 		return
 	}
-
 	moduleProperties := edgeAgent.(map[string]interface{})[expectedModulePropertiesKey]
-	if _, ok := moduleProperties.(map[string]interface{})["settings"]; !ok {
-		t.Fatal("configuration module properties is missing 'settings' key")
-	}
-
-	if _, ok := moduleProperties.(map[string]interface{})["startupOrder"]; !ok {
-		t.Fatal("configuration module properties is missing 'startupOrder' key")
-	}
-
-	if _, ok := moduleProperties.(map[string]interface{})["env"]; !ok {
-		t.Fatal("configuration module properties is missing 'env' key")
-	}
+	assert.Contains(t, moduleProperties, "settings")
+	assert.Contains(t, moduleProperties, "startupOrder")
+	assert.Contains(t, moduleProperties, "env")
 
 	settings := moduleProperties.(map[string]interface{})["settings"]
-	if _, ok := settings.(map[string]string)["image"]; !ok {
-		t.Fatal("configuration settings sey is missing 'image' key")
-	}
-
-	if _, ok := settings.(map[string]string)["createOptions"]; !ok {
-		t.Fatal("configuration settings is missing 'createOptions' key")
-	}
+	assert.Contains(t, settings, "image")
+	assert.Contains(t, settings, "createOptions")
 
 	env := moduleProperties.(map[string]interface{})["env"]
 	for k, v := range envVars {
-		if _, ok := env.(map[string]interface{})[k]; !ok {
-			t.Fatalf("configuration env is missing '%s' key", k)
-		}
+		assert.Contains(t, env, k)
 
 		gotV := env.(map[string]interface{})[k].(struct {
 			Value string `json:"value"`
 		}).Value
-		if gotV != v {
-			t.Errorf("expected '%s'='%s' got '%s'= '%s'", k, v, k, gotV)
-		}
+		assert.Equal(t, v, gotV)
 	}
 
-	if _, ok := moduleProperties.(map[string]interface{})["type"]; !ok {
-		t.Fatal("configuration module properties is missing 'type' key")
-	}
-
-	modType := moduleProperties.(map[string]interface{})["type"]
-	if modType != "docker" {
-		t.Fatalf("expected 'docker' got '%s'", modType)
-	}
-
-	if _, ok := moduleProperties.(map[string]interface{})["status"]; !ok {
-		t.Fatal("configuration module properties is missing 'status' key")
-	}
-
-	modStatus := moduleProperties.(map[string]interface{})["status"]
-	if modStatus != "running" {
-		t.Fatalf("expected 'running' got '%s'", modStatus)
-	}
-
-	if _, ok := moduleProperties.(map[string]interface{})["restartPolicy"]; !ok {
-		t.Fatal("configuration module properties is missing 'restartPolicy' key")
-	}
-
-	if _, ok := moduleProperties.(map[string]interface{})["version"]; !ok {
-		t.Fatal("configuration module properties is missing 'version' key")
-	}
+	assert.Equal(t, moduleProperties.(map[string]interface{})["type"], "docker")
+	assert.Equal(t, moduleProperties.(map[string]interface{})["status"], "running")
+	assert.Equal(t, moduleProperties.(map[string]interface{})["restartPolicy"], "always")
+	assert.Equal(t, moduleProperties.(map[string]interface{})["version"], "1.0")
 }
