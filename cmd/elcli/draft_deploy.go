@@ -19,11 +19,11 @@ var draftDeployCmd = &cobra.Command{
 		checkRequired("deployment.id", "device.name", "module.name")
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		executeDraftDeploy()
+		deployDraft()
 	},
 }
 
-func executeDraftDeploy() {
+func deployDraft() {
 	c := azure.NewClient(nil).WithAuthToken(config.Auth.Token)
 	c.BaseURL, _ = url.Parse(fmt.Sprintf("https://%s.azure-devices.net/", config.Infra.Hub))
 

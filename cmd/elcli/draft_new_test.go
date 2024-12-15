@@ -9,14 +9,6 @@ import (
 	"github.com/unbrikd/edge-leap/internal/configuration"
 )
 
-// Helper function to reset global variables before each test
-func resetGlobals() {
-	cfgFile = ""
-	force = false
-	viper.Reset()
-	os.Remove(cfgFile)
-}
-
 // TestConfigFileCreationNoExisting tests creating a config file when it doesn't exist
 func TestConfigFileCreationNoExisting(t *testing.T) {
 	resetGlobals()
@@ -67,12 +59,4 @@ func TestNewDraft(t *testing.T) {
 	}
 	assert.Equal(t, "test-id", viper.GetString("session"))
 	assert.Equal(t, configuration.CONFIG_VERSION, viper.GetString("version"))
-}
-
-// Setup function to create necessary directories before tests
-func TestMain(m *testing.M) {
-	os.MkdirAll("testdata", 0755)
-	exitCode := m.Run()
-	os.RemoveAll("testdata")
-	os.Exit(exitCode)
 }
