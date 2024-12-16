@@ -39,10 +39,18 @@ func deployDraft() {
 		os.Exit(1)
 	}
 
+	if config.Deployment.TargetCondition == "" {
+		config.Deployment.TargetCondition = fmt.Sprintf("tags.application.%s='%s'", config.Module.Name, config.Id)
+	}
+
+	if config.Deployment.Id == "" {
+		config.Deployment.Id = fmt.Sprintf("%s-%s", config.Deployment.Id, config.Id)
+	}
+
 	d := azure.Configuration{
-		Id:              fmt.Sprintf("%s-%s", config.Deployment.Id, config.Id),
+		Id:              config.Deployment.Id,
 		Priority:        config.Deployment.Priority,
-		TargetCondition: fmt.Sprintf("tags.application.%s='%s'", config.Module.Name, config.Id),
+		TargetCondition: config.Deployment.TargetCondition,
 	}
 	d.SetContent(config.Module.Name, config.Module.Image, config.Module.CreateOptions, config.Module.StartupOrder, moduleEnv)
 
